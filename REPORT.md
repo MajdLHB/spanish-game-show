@@ -1,6 +1,73 @@
 # Build Report
 
-A running log of what was built, in plain English. Each entry is dated and self-contained.
+A running log of what was built, in plain English. Each entry is dated and self-contained. Newest on top.
+
+---
+
+## 2026-05-06 (later) — Full redesign: EL GRAN SHOW broadcast edition
+
+### Goal
+Redo the project as a **high-end, competitive TV-game-show** for a Spanish class. The earlier "¡Adivina la Profesion!" was a working but basic prototype; this iteration is a complete production-style rewrite: fixed 16:9 stage, persistent broadcast scoreboard, presenter-driven step machine, hardcoded intersecting crossword (`SUPERMERCADO`, `JOYERÍA`, `PROFESORA`, `INGENIERO`), and overlays for hint / reveal / transition / video / live-guest / finale.
+
+### Files touched
+
+| File | Action |
+|---|---|
+| `index.html` | **Replaced** completely (~880 lines). New 16:9 stage architecture, step-machine flow, broadcast styling. |
+| `README.md`  | **Replaced** to document the new app — flow, customization hooks, host controls, tech notes. |
+| `REPORT.md`  | This entry appended on top of the previous one. |
+
+The previous v1 of the app remains in git history if needed.
+
+### What's new vs. the previous version
+
+- **Fixed 16:9 stage**: a `1920×1080` element is rendered internally and JS scales it via `transform: scale(min(w/1920, h/1080))` on every resize. Layout never warps on different projectors or windows.
+- **Persistent broadcast scoreboard**: top-of-stage strip with Team A (cyan) / Team B (pink) blocks, each with two player-name pill placeholders, large neon score numbers (~6.5rem), gold "VS" divider, and a `bump` keyframe animation that fires on score change.
+- **Linear presenter-controlled step machine**: 22 steps total — `preshow → countdown → intro_logo` → for each of 4 words: `highlight → hint → reveal → transition → feature` → `finale`. A floating "NEXT ▶" button (with a SPACE keycap badge) and the Spacebar both advance. The reveal step blocks both — you must click +1 POINT TEAM A/B to award a point and advance. Auto-advance steps (countdown, intro logo, logo flash) handle their own timing.
+- **Hardcoded crossword**: 13×12 grid (only 33 cells exist; the rest are `visibility:hidden` placeholders). Verified intersections:
+  - `SUPERMERCADO` (row 3) ∩ `PROFESORA` (col 3) at letter **P**
+  - `SUPERMERCADO` (row 3) ∩ `INGENIERO` (col 4) at letter **E**
+  - `JOYERÍA` (row 7) ∩ `PROFESORA` (col 3) at letter **E**
+  - `JOYERÍA` (row 7) ∩ `INGENIERO` (col 4) at letter **R**
+  - The `Í` in `JOYERÍA` is correctly stored and rendered (`Array.from()` is used so the accented character isn't broken by `String.split("")`).
+- **Differentiated hints per word**:
+  - W1: text overlay with a long descriptive hint.
+  - W2: 3-emoji card with staggered pop-in animation.
+  - W3 / W4: no overlay — just a small bottom-of-board cue badge that says "🎤 EL PRESENTADOR INTRODUCE LA PALABRA".
+- **Differentiated features per word**:
+  - W1 / W2: full-screen YouTube embed with autoplay parameter appended.
+  - W3 / W4: golden "★ INVITADO EN VIVO ★" guest title card with the word + a placeholder presenter name.
+  - Both have a "↩ BACK TO BOARD" button, which is just an alias for advancing.
+- **Reveal screen**: full-screen gradient word with zoom-in + animated gradient-shift, sparkle particles spawned over the lower half, and the two large color-coded "Point Team A / Point Team B" buttons. Behind the overlay, the corresponding crossword cells fill in with a 3D card-flip animation, staggered ~70 ms each, so the letters are still revealed when overlays close.
+- **Transition step**: short logo flash overlay (1.5 s, with sound effect placeholder), auto-advance.
+- **Finale**: hides scoreboard + crossword, shows trophy, big gradient "WINNER: TEAM X" (or "EMPATE — TIE!" on a tie), final score breakdown, theme song fade-out, and continuous CSS confetti rain. "PLAY AGAIN" reloads.
+- **Visual polish**: animated background grid, subtle TV scanlines via `repeating-linear-gradient` blended over everything, neon glow shadows, gradient gradients (background-position keyframe sweeps), drop-shadows on logo / word reveals.
+- **Customization hooks**: every swap-in value (audio file paths, video URLs, guest names, hint content, player names, studio image URL) is clearly marked with `PLACEHOLDER` comments or obvious replace tokens.
+
+### Behavior details worth noting
+
+- Theme song begins on countdown step (after first user click, satisfying browser autoplay policy).
+- Audio elements are tolerant of missing files — `try/catch` around `play()` plus `.catch(() => {})`.
+- Spacebar handler ignores key presses while focus is in an `INPUT` or `TEXTAREA` (defensive, even though no inputs exist in normal flow).
+- `awardPoint()` clears `videoIframe.src` defensively so a previous video doesn't keep playing in the background.
+- Step indicator in the bottom-right shows live progress (e.g. `STEP 7 / 22`).
+
+### Things deliberately not done
+
+- No `localStorage` persistence — refreshing resets the show. (Spec says reload-restart via "PLAY AGAIN" is acceptable.)
+- No way to swap the 4 words without also re-deriving the grid coordinates. Documented in README as a manual operation.
+- No "Back" button in the step machine — presenter-controlled forward-only flow keeps the broadcast vibe and avoids accidental rewinds during a live show.
+- No real sound effects bundled — only `<audio>` tag placeholders. Browsers will silently no-op when the source files don't exist.
+
+### How it was tested
+
+Static-built only (no dev server). Logic was self-checked by tracing through the step machine and verifying:
+- All 22 steps reachable in order.
+- Reveal blocks Spacebar / Next; Point A/B buttons release it.
+- Crossword intersections all match (each shared cell's letter agrees in both words).
+- 16:9 scale math: `min(w/1920, h/1080)` keeps aspect ratio on any window.
+
+The user should open `index.html` in a browser to verify visually before showtime.
 
 ---
 
