@@ -3,47 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EL GRAN SHOW — Broadcast Edition</title>
+<title>EL GRAN SHOW — Studio Edition</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 /* ============================================================
-   0. RESET + EDITORIAL BROADCAST THEME
+   0. RESET + STUDIO THEATRICAL THEME
 ============================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  /* surfaces */
-  --paper:        #ffffff;
-  --cream:        #faf6ed;
-  --cream-2:      #f1eada;
-  /* ink */
-  --ink:          #15233a;
-  --ink-soft:     #5a657c;
-  --hairline:     #d8d2c2;
-  /* brand */
-  --navy:         #14365b;   /* editorial primary  */
-  --navy-2:       #1f4f82;
-  --coral:        #d34b35;   /* warm accent / team b */
-  --coral-2:      #e76752;
-  --gold:         #c9a04a;
-  --gold-2:       #e6cf94;
-  --mint:         #4eb89c;
-  /* team aliases */
-  --team-a:       var(--navy);
-  --team-a-2:     var(--navy-2);
-  --team-b:       var(--coral);
-  --team-b-2:     var(--coral-2);
-  /* typography */
-  --serif:        "Playfair Display", "Iowan Old Style", Georgia, serif;
-  --sans:         "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  /* shadows */
-  --shadow-sm:    0 4px 14px rgba(21, 35, 58, .07);
-  --shadow:       0 8px 28px rgba(21, 35, 58, .10);
-  --shadow-lg:    0 18px 48px rgba(21, 35, 58, .15);
+  /* Studio backdrop (rich theatrical blue-teal) */
+  --stage-deep:    #07182b;
+  --stage-mid:     #0e2a47;
+  --stage-glow:    #14406b;
+  --stage-purple:  #2a1a4a;
+
+  /* Cards / paper surfaces */
+  --paper:         #fdf7e6;
+  --paper-2:       #f6ecd3;
+  --cream:         #fbf6e7;
+  --hairline:      #c8b88a;
+
+  /* Ink */
+  --ink:           #15233a;
+  --ink-soft:      #4d5b76;
+
+  /* Brand */
+  --gold:          #e6b34a;
+  --gold-2:        #f5d77f;
+  --gold-deep:     #b8862e;
+  --coral:         #ee5b3c;
+  --coral-2:       #ff7a5b;
+  --ruby:          #a02e3a;
+  --teal:          #3ab59f;
+  --teal-2:        #5ed8c0;
+
+  /* Team aliases */
+  --team-a:        #14406b;
+  --team-a-2:      #1f5c97;
+  --team-b:        #ee5b3c;
+  --team-b-2:      #ff7a5b;
+
+  /* Typography */
+  --serif:         "Playfair Display", "Iowan Old Style", Georgia, serif;
+  --sans:          "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Shadows */
+  --shadow-sm:     0 4px 14px rgba(0, 0, 0, .25);
+  --shadow:        0 10px 32px rgba(0, 0, 0, .35);
+  --shadow-lg:     0 22px 60px rgba(0, 0, 0, .45);
+  --gold-glow:     0 0 32px rgba(230, 179, 74, .55);
 }
 html, body {
   height: 100%; overflow: hidden;
-  background: #0a0a0a; /* outer letterbox is just neutral black */
+  background: #02060d;
   color: var(--ink);
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
@@ -52,41 +65,149 @@ html, body {
 button { font-family: inherit; }
 
 /* ============================================================
-   1. STAGE — fixed 1920×1080, scaled to fit
+   1. STAGE — fixed 1920×1080, scaled to fit any monitor
 ============================================================ */
 .stage-wrap {
   position: fixed; inset: 0;
   display: grid; place-items: center;
-  background: #0a0a0a;
+  background:
+    radial-gradient(ellipse at 50% 0%,    rgba(20, 64, 107, .35), transparent 60%),
+    radial-gradient(ellipse at 0% 100%,   rgba(42, 26, 74, .4),  transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgba(160, 46, 58, .25), transparent 55%),
+    linear-gradient(180deg, #02060d 0%, #050a14 50%, #02060d 100%);
+  overflow: hidden;
+}
+/* drifting halo behind everything (outer letterbox) */
+.stage-wrap::before {
+  content: ""; position: absolute; inset: -20%;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(230, 179, 74, .07), transparent 35%),
+    radial-gradient(circle at 70% 60%, rgba(58, 181, 159, .05), transparent 35%);
+  animation: bgDrift 22s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes bgDrift {
+  0%   { transform: translate(-2%, -2%) scale(1); }
+  100% { transform: translate(2%, 2%)  scale(1.04); }
 }
 .stage {
   position: relative;
   width: 1920px; height: 1080px;
   transform-origin: center center;
-  background: var(--cream);
-  background-image:
-    radial-gradient(ellipse at top left,    rgba(20, 54, 91, .04), transparent 55%),
-    radial-gradient(ellipse at bottom right, rgba(211, 75, 53, .035), transparent 55%);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,  rgba(230, 179, 74, .08), transparent 65%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(238, 91, 60, .06), transparent 65%),
+    linear-gradient(180deg, var(--stage-mid) 0%, var(--stage-deep) 50%, #050d1c 100%);
   overflow: hidden;
   isolation: isolate;
-}
-/* very subtle paper grain */
-.stage::before {
-  content: ""; position: absolute; inset: 0;
-  background-image:
-    radial-gradient(rgba(21,35,58,.025) 1px, transparent 1px);
-  background-size: 4px 4px;
-  pointer-events: none;
-  z-index: 1;
-  opacity: .6;
+  box-shadow: 0 0 80px rgba(0, 0, 0, .8), inset 0 0 120px rgba(0, 0, 0, .35);
+  border: 2px solid rgba(230, 179, 74, .15);
 }
 
 /* ============================================================
-   2. LAYERS — full-stage overlays
+   2. STAGE BACKDROP — spotlight beams + grid + ambient particles
+============================================================ */
+/* sweeping spotlight beams from top */
+.stage::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    /* center beam */
+    conic-gradient(from 200deg at 50% -10%,
+      transparent 0deg,
+      rgba(230, 179, 74, .12) 12deg,
+      transparent 25deg,
+      transparent 335deg,
+      rgba(230, 179, 74, .12) 348deg,
+      transparent 360deg),
+    /* left beam */
+    conic-gradient(from 220deg at 18% -10%,
+      transparent 0deg,
+      rgba(58, 181, 159, .08) 14deg,
+      transparent 28deg),
+    /* right beam */
+    conic-gradient(from 130deg at 82% -10%,
+      transparent 0deg,
+      rgba(238, 91, 60, .08) 14deg,
+      transparent 28deg);
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: screen;
+  animation: beamSweep 14s ease-in-out infinite alternate;
+}
+@keyframes beamSweep {
+  0%   { transform: translateX(-1.5%) rotate(-1.5deg); opacity: .85; }
+  100% { transform: translateX(1.5%)  rotate(1.5deg);  opacity: 1; }
+}
+/* subtle scanline / texture overlay (very subtle, broadcast feel) */
+.stage::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,.012) 0 1px,
+      transparent 1px 3px),
+    radial-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: auto, 4px 4px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: .65;
+}
+
+/* ambient particle layer (specks of dust drifting across stage) */
+.ambient {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  overflow: hidden;
+}
+.dust {
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(245, 215, 127, .8);
+  box-shadow: 0 0 8px rgba(245, 215, 127, .9);
+  animation: dustFloat linear infinite;
+  opacity: 0;
+}
+@keyframes dustFloat {
+  0%   { transform: translate(0, 0) scale(.4);   opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translate(var(--dx, 100px), -1100px) scale(1.1); opacity: 0; }
+}
+
+/* marquee lights — bulbs around the stage edge */
+.marquee {
+  position: absolute;
+  display: flex; justify-content: space-between;
+  z-index: 4;
+  pointer-events: none;
+}
+.marquee.top    { top: 8px;    left: 18px; right: 18px; }
+.marquee.bottom { bottom: 8px; left: 18px; right: 18px; }
+.marquee.left   { top: 18px;   bottom: 18px; left: 8px;
+                  flex-direction: column; align-items: flex-start; width: 14px; }
+.marquee.right  { top: 18px;   bottom: 18px; right: 8px;
+                  flex-direction: column; align-items: flex-end;  width: 14px; }
+.bulb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--gold-2);
+  box-shadow:
+    0 0 10px var(--gold-2),
+    0 0 22px rgba(245, 215, 127, .7),
+    inset 0 -2px 3px rgba(184, 134, 46, .6);
+  animation: bulbBlink 1.4s ease-in-out infinite;
+}
+@keyframes bulbBlink {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%      { opacity: .35; transform: scale(.85); }
+}
+
+/* ============================================================
+   3. LAYERS — full-stage overlays
 ============================================================ */
 .layer { position: absolute; inset: 0; z-index: 30; }
 
-/* common: each layer is hidden until .active */
 .preshow,
 .countdown,
 .intro-logo,
@@ -107,15 +228,25 @@ button { font-family: inherit; }
 .segue-overlay.active { display: flex; }
 
 /* ============================================================
-   3. PRE-SHOW
+   4. PRE-SHOW
 ============================================================ */
 .preshow {
   flex-direction: column;
   align-items: center; justify-content: center;
-  background: var(--cream);
-  gap: 50px;
+  gap: 44px;
   z-index: 30;
   padding: 80px;
+}
+.preshow::before {
+  /* central spotlight pool */
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 50% 40% at 50% 50%, rgba(230, 179, 74, .14), transparent 70%);
+  pointer-events: none;
+  animation: pulseSlow 4s ease-in-out infinite alternate;
+}
+@keyframes pulseSlow {
+  from { opacity: .65; }
+  to   { opacity: 1; }
 }
 .on-air {
   display: inline-flex; align-items: center; gap: 14px;
@@ -124,153 +255,224 @@ button { font-family: inherit; }
   font-size: .9rem; font-weight: 800;
   letter-spacing: .4em;
   border-radius: 4px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 0 24px rgba(238, 91, 60, .55), var(--shadow-sm);
+  animation: liveGlow 2s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 2;
+}
+@keyframes liveGlow {
+  from { box-shadow: 0 0 18px rgba(238, 91, 60, .45), var(--shadow-sm); }
+  to   { box-shadow: 0 0 36px rgba(238, 91, 60, .9),  var(--shadow); }
 }
 .on-air-dot {
   width: 12px; height: 12px;
   background: white; border-radius: 50%;
   animation: blink 1.5s ease-in-out infinite;
 }
-@keyframes blink { 50% { opacity: .35; } }
+@keyframes blink { 50% { opacity: .3; } }
 .preshow-mark {
   display: flex; align-items: center; gap: 30px;
+  position: relative; z-index: 2;
 }
 .preshow-mark::before, .preshow-mark::after {
-  content: ""; width: 100px; height: 2px; background: var(--gold);
+  content: ""; width: 110px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 .preshow-mark span {
   font-family: var(--sans);
   font-size: 1rem; font-weight: 700;
   letter-spacing: .55em;
-  color: var(--gold);
+  color: var(--gold-2);
+  text-shadow: 0 0 14px rgba(230, 179, 74, .6);
 }
 .show-title {
   font-family: var(--serif);
   font-size: 12rem; font-weight: 900;
-  line-height: .92;
+  line-height: .9;
   letter-spacing: -.02em;
-  color: var(--ink);
+  color: var(--paper);
   text-align: center;
+  position: relative; z-index: 2;
+  text-shadow:
+    0 6px 18px rgba(0, 0, 0, .55),
+    0 0 38px rgba(230, 179, 74, .25);
+  background: linear-gradient(180deg, #fff8e2 0%, #f5d77f 55%, #e6b34a 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: titleShimmer 4s ease-in-out infinite;
+}
+@keyframes titleShimmer {
+  0%, 100% { filter: drop-shadow(0 0 18px rgba(230, 179, 74, .35)); }
+  50%      { filter: drop-shadow(0 0 32px rgba(230, 179, 74, .85)); }
 }
 .show-subtitle {
   font-size: 1.2rem; font-weight: 600;
   letter-spacing: .55em;
-  color: var(--ink-soft);
+  color: var(--gold-2);
   text-transform: uppercase;
+  position: relative; z-index: 2;
 }
 .start-btn {
   margin-top: 30px;
   font-family: var(--sans);
-  font-size: 1.2rem; font-weight: 800;
+  font-size: 1.3rem; font-weight: 800;
   letter-spacing: .35em;
-  color: white;
-  background: var(--navy);
-  border: none;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%);
+  border: 2px solid rgba(255, 248, 226, .55);
   padding: 26px 64px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  box-shadow: var(--shadow-lg);
-  transition: transform .25s, background .25s, box-shadow .25s;
+  box-shadow:
+    0 14px 38px rgba(184, 134, 46, .45),
+    inset 0 1px 0 rgba(255, 255, 255, .55);
+  transition: transform .25s, box-shadow .25s, filter .25s;
   display: inline-flex; align-items: center; gap: 16px;
+  position: relative; z-index: 2;
+  overflow: hidden;
+  animation: btnPulse 2.4s ease-in-out infinite;
+}
+.start-btn::before {
+  /* rotating sheen */
+  content: ""; position: absolute; top: 0; left: -120%;
+  width: 60%; height: 100%;
+  background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,.55) 50%, transparent 100%);
+  animation: sheen 3.2s ease-in-out infinite;
+}
+@keyframes sheen {
+  0%   { left: -120%; }
+  60%  { left: 130%; }
+  100% { left: 130%; }
+}
+@keyframes btnPulse {
+  0%, 100% { box-shadow: 0 14px 38px rgba(184, 134, 46, .45), inset 0 1px 0 rgba(255,255,255,.55); }
+  50%      { box-shadow: 0 18px 50px rgba(184, 134, 46, .8),  inset 0 1px 0 rgba(255,255,255,.7); }
 }
 .start-btn:hover {
-  transform: translateY(-3px);
-  background: var(--navy-2);
-  box-shadow: 0 22px 54px rgba(20, 54, 91, .35);
+  transform: translateY(-3px) scale(1.03);
+  filter: brightness(1.08);
 }
 .start-btn .triangle {
   width: 0; height: 0;
-  border-left: 14px solid white;
-  border-top: 9px solid transparent;
-  border-bottom: 9px solid transparent;
+  border-left: 16px solid var(--ink);
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
 }
 
 /* ============================================================
-   4. COUNTDOWN
+   5. COUNTDOWN
 ============================================================ */
 .countdown {
   align-items: center; justify-content: center;
-  background: var(--cream);
+  background: radial-gradient(ellipse at center, rgba(20, 64, 107, .65), rgba(7, 24, 43, .9));
 }
 .countdown-ring {
-  position: relative; width: 600px; height: 600px;
+  position: relative; width: 640px; height: 640px;
   display: flex; align-items: center; justify-content: center;
 }
 .countdown-ring::before {
   content: ""; position: absolute; inset: 0;
   border-radius: 50%;
-  border: 2px solid var(--gold);
-  opacity: .35;
+  border: 3px solid var(--gold);
+  box-shadow: 0 0 40px rgba(230, 179, 74, .55), inset 0 0 30px rgba(230, 179, 74, .25);
+  animation: ringSpin 14s linear infinite, ringPulse 2s ease-in-out infinite;
 }
 .countdown-ring::after {
-  content: ""; position: absolute; inset: 30px;
+  content: ""; position: absolute; inset: 36px;
   border-radius: 50%;
-  border: 1px solid var(--ink-soft);
-  opacity: .25;
+  border: 1.5px dashed rgba(245, 215, 127, .55);
+  animation: ringSpinReverse 22s linear infinite;
+}
+@keyframes ringSpin        { to { transform: rotate(360deg); } }
+@keyframes ringSpinReverse { to { transform: rotate(-360deg); } }
+@keyframes ringPulse {
+  0%, 100% { box-shadow: 0 0 40px rgba(230, 179, 74, .45), inset 0 0 30px rgba(230, 179, 74, .25); }
+  50%      { box-shadow: 0 0 80px rgba(230, 179, 74, .9),  inset 0 0 50px rgba(230, 179, 74, .45); }
 }
 .countdown-num {
   font-family: var(--serif);
   font-size: 28rem; font-weight: 900;
-  color: var(--ink);
+  color: var(--gold-2);
   letter-spacing: -.04em;
+  text-shadow: 0 0 50px rgba(230, 179, 74, .85), 0 8px 22px rgba(0, 0, 0, .65);
   animation: countdownPulse 1s ease-in-out;
 }
 @keyframes countdownPulse {
-  0%   { transform: scale(0.4); opacity: 0; }
-  30%  { transform: scale(1.18); opacity: 1; }
-  70%  { transform: scale(1);    opacity: 1; }
-  100% { transform: scale(0.5); opacity: 0; }
+  0%   { transform: scale(0.4) rotate(-6deg);  opacity: 0; }
+  30%  { transform: scale(1.18) rotate(0);     opacity: 1; }
+  70%  { transform: scale(1)    rotate(0);     opacity: 1; }
+  100% { transform: scale(0.5)  rotate(6deg);  opacity: 0; }
 }
 
 /* ============================================================
-   5. INTRO LOGO + LOGO FLASH (transition step)
+   6. INTRO LOGO + LOGO FLASH
 ============================================================ */
 .intro-logo, .logo-flash {
   align-items: center; justify-content: center;
-  background: var(--cream);
+  background: radial-gradient(ellipse at center, rgba(42, 26, 74, .55), rgba(7, 24, 43, .92));
 }
 .intro-frame, .flash-frame {
   display: flex; flex-direction: column; align-items: center; gap: 30px;
+  position: relative;
 }
 .intro-line {
   display: flex; align-items: center; gap: 26px;
   font-family: var(--sans);
   font-size: 1rem; font-weight: 700;
   letter-spacing: .65em;
-  color: var(--gold);
+  color: var(--gold-2);
+  text-shadow: 0 0 14px rgba(230, 179, 74, .55);
 }
 .intro-line::before, .intro-line::after {
-  content: ""; width: 80px; height: 1.5px; background: var(--gold);
+  content: ""; width: 90px; height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 .intro-headline {
   font-family: var(--serif);
   font-size: 13rem; font-weight: 900;
   line-height: .9;
   letter-spacing: -.02em;
-  color: var(--ink);
+  color: var(--paper);
   text-align: center;
+  background: linear-gradient(180deg, #fff8e2 0%, #f5d77f 55%, #e6b34a 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, .55))
+          drop-shadow(0 0 30px rgba(230, 179, 74, .55));
 }
 .intro-logo .intro-headline {
   animation: logoZoom 2.4s cubic-bezier(.2,.8,.3,1.2) both;
 }
 @keyframes logoZoom {
-  0%   { transform: scale(0.5); opacity: 0; letter-spacing: .25em; }
-  60%  { transform: scale(1.08); opacity: 1; letter-spacing: -.025em; }
-  100% { transform: scale(1); opacity: 1; letter-spacing: -.02em; }
+  0%   { transform: scale(0.4) rotate(-3deg); opacity: 0; letter-spacing: .25em; }
+  60%  { transform: scale(1.08) rotate(0);     opacity: 1; letter-spacing: -.025em; }
+  100% { transform: scale(1)    rotate(0);     opacity: 1; letter-spacing: -.02em; }
 }
 .logo-flash .intro-headline {
   font-size: 9rem;
   animation: logoFlash 1.4s ease-out both;
 }
 @keyframes logoFlash {
-  0%   { transform: scale(0.6); opacity: 0; }
+  0%   { transform: scale(0.5);  opacity: 0; }
   30%  { transform: scale(1.18); opacity: 1; }
   60%  { transform: scale(1);    opacity: 1; }
-  100% { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.5);  opacity: 0; }
+}
+.flash-frame::after {
+  /* radial flash */
+  content: ""; position: absolute; inset: -60%;
+  background: radial-gradient(circle, rgba(230, 179, 74, .35) 0%, transparent 55%);
+  pointer-events: none;
+  animation: flashPulse 1.4s ease-out both;
+}
+@keyframes flashPulse {
+  0%   { opacity: 0; transform: scale(.4); }
+  30%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.6); }
 }
 
 /* ============================================================
-   6. SCOREBOARD — broadcast lower-third style (top of stage)
+   7. SCOREBOARD — broadcast lower-third
 ============================================================ */
 .scoreboard {
   position: absolute; top: 0; left: 0; right: 0;
@@ -280,10 +482,15 @@ button { font-family: inherit; }
   grid-template-columns: 1fr auto 1fr;
   align-items: stretch;
   gap: 30px;
-  background: var(--paper);
-  border-bottom: 4px solid var(--navy);
-  box-shadow: 0 6px 18px rgba(21, 35, 58, .10);
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  border-bottom: 4px solid var(--gold);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .45), 0 1px 0 rgba(255, 255, 255, .35) inset;
   z-index: 10;
+  animation: chyronSlide .7s cubic-bezier(.2,.8,.3,1.2) both;
+}
+@keyframes chyronSlide {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
 }
 .scoreboard.active { display: grid; }
 .team {
@@ -298,10 +505,12 @@ button { font-family: inherit; }
   text-align: right;
 }
 .team-stripe {
-  background: var(--team-a);
+  background: linear-gradient(180deg, var(--team-a) 0%, var(--team-a-2) 100%);
+  box-shadow: 0 0 12px rgba(31, 92, 151, .4);
 }
 .team.b .team-stripe {
-  background: var(--team-b);
+  background: linear-gradient(180deg, var(--team-b) 0%, var(--team-b-2) 100%);
+  box-shadow: 0 0 12px rgba(238, 91, 60, .4);
 }
 .team-info {
   display: flex; flex-direction: column;
@@ -341,29 +550,31 @@ button { font-family: inherit; }
   align-self: center;
   font-variant-numeric: tabular-nums;
   min-width: 100px; text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .15);
 }
-.team-score.bump { animation: scoreBump .65s cubic-bezier(.2,.8,.3,1.4); }
+.team-score.bump { animation: scoreBump .8s cubic-bezier(.2,.8,.3,1.4); }
 @keyframes scoreBump {
   0%   { transform: scale(1); color: var(--ink); }
-  40%  { transform: scale(1.32); color: var(--team-a); }
+  30%  { transform: scale(1.45) rotate(-4deg); color: var(--team-a); text-shadow: 0 0 24px rgba(20, 64, 107, .55); }
   100% { transform: scale(1); color: var(--ink); }
 }
 .team.b .team-score.bump { animation-name: scoreBumpB; }
 @keyframes scoreBumpB {
   0%   { transform: scale(1); color: var(--ink); }
-  40%  { transform: scale(1.32); color: var(--team-b); }
+  30%  { transform: scale(1.45) rotate(4deg); color: var(--team-b); text-shadow: 0 0 24px rgba(238, 91, 60, .55); }
   100% { transform: scale(1); color: var(--ink); }
 }
 .scoreboard-center {
   align-self: center;
   text-align: center;
   padding: 0 28px;
+  position: relative;
 }
 .center-mark {
   display: flex; align-items: center; justify-content: center; gap: 12px;
   font-size: .68rem; font-weight: 800;
   letter-spacing: .55em;
-  color: var(--gold);
+  color: var(--coral);
   margin-bottom: 6px;
 }
 .center-mark::before, .center-mark::after {
@@ -385,7 +596,7 @@ button { font-family: inherit; }
 }
 
 /* ============================================================
-   7. CROSSWORD — newspaper-style, true intersections (gap:0)
+   8. CROSSWORD — newspaper-style, true intersections
 ============================================================ */
 .board {
   position: absolute;
@@ -397,29 +608,55 @@ button { font-family: inherit; }
   gap: 26px;
   z-index: 5;
 }
-.board.active { display: flex; }
+.board.active { display: flex; animation: boardIn .7s cubic-bezier(.2,.8,.3,1.2) both; }
+@keyframes boardIn {
+  from { opacity: 0; transform: translate(-50%, 24px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
 .board-mark {
   display: flex; align-items: center; gap: 22px;
   font-family: var(--sans);
   font-size: .85rem; font-weight: 800;
   letter-spacing: .65em;
-  color: var(--gold);
+  color: var(--gold-2);
   text-transform: uppercase;
+  text-shadow: 0 0 14px rgba(230, 179, 74, .5);
 }
 .board-mark::before, .board-mark::after {
-  content: ""; width: 70px; height: 1.5px; background: var(--gold);
+  content: ""; width: 70px; height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 .crossword-card {
   padding: 26px 28px 30px;
-  background: var(--paper);
-  border-radius: 6px;
-  box-shadow: var(--shadow-lg);
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  border-radius: 8px;
+  box-shadow:
+    var(--shadow-lg),
+    0 0 0 4px rgba(230, 179, 74, .25),
+    0 0 0 6px rgba(230, 179, 74, .08);
+  position: relative;
+  overflow: hidden;
+}
+.crossword-card::before {
+  /* slow light sweep */
+  content: ""; position: absolute; top: -50%; left: -100%;
+  width: 60%; height: 200%;
+  background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,.35) 50%, transparent 100%);
+  animation: cardSweep 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes cardSweep {
+  0%   { left: -100%; }
+  60%  { left: 130%; }
+  100% { left: 130%; }
 }
 .crossword {
   display: grid;
   grid-template-columns: repeat(13, 56px);
   grid-template-rows:    repeat(12, 56px);
-  gap: 0; /* cells touch — true intersections */
+  gap: 0;
+  position: relative;
+  z-index: 1;
 }
 .cell {
   position: relative;
@@ -449,7 +686,7 @@ button { font-family: inherit; }
   display: inline-block;
 }
 .cell.filled {
-  background: var(--paper);
+  background: linear-gradient(180deg, #fff8e2 0%, var(--gold-2) 100%);
 }
 .cell.filled .letter {
   animation: cellFlip .55s cubic-bezier(.2,.8,.3,1.4) both;
@@ -459,24 +696,24 @@ button { font-family: inherit; }
   100% { transform: rotateX(0)      scale(1);   opacity: 1; }
 }
 .cell.highlighted {
-  background: var(--gold-2);
-  outline: 2px solid var(--gold);
+  background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%);
+  outline: 2.5px solid var(--gold-deep);
   outline-offset: -1px;
   z-index: 2;
   animation: highlightPulse 1.6s ease-in-out infinite;
+  box-shadow: 0 0 18px rgba(230, 179, 74, .65);
 }
 @keyframes highlightPulse {
-  0%, 100% { background: var(--gold-2); }
-  50%      { background: #f1dca0; }
+  0%, 100% { background: linear-gradient(180deg, var(--gold-2), var(--gold)); }
+  50%      { background: linear-gradient(180deg, #fff5d0, var(--gold-2)); }
 }
 
-/* presenter cue (no on-screen hint for words 3 & 4) */
 .presenter-cue {
   position: absolute;
   left: 50%; top: 1010px;
   transform: translateX(-50%);
   display: none;
-  background: var(--paper);
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
   border-left: 8px solid var(--coral);
   padding: 16px 36px 16px 28px;
   font-family: var(--sans);
@@ -494,33 +731,45 @@ button { font-family: inherit; }
 }
 
 /* ============================================================
-   8. HINT OVERLAY — chyron-style card
+   9. HINT OVERLAY
 ============================================================ */
 .hint-overlay {
-  background: rgba(250, 246, 237, .96);
-  backdrop-filter: blur(2px);
+  background:
+    radial-gradient(ellipse at center, rgba(20, 64, 107, .35), transparent 70%),
+    rgba(7, 24, 43, .82);
+  backdrop-filter: blur(4px);
   align-items: center; justify-content: center;
 }
 .hint-card {
   width: 1500px;
-  background: var(--paper);
-  border-radius: 8px;
-  box-shadow: var(--shadow-lg);
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg), 0 0 60px rgba(230, 179, 74, .35);
   overflow: hidden;
   animation: hintIn .55s cubic-bezier(.2,.8,.3,1.2) both;
+  border: 2px solid rgba(230, 179, 74, .3);
 }
 @keyframes hintIn {
-  from { opacity: 0; transform: translateY(30px) scale(.96); }
+  from { opacity: 0; transform: translateY(40px) scale(.94); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 .hint-header {
-  background: var(--navy);
+  background: linear-gradient(90deg, var(--team-a) 0%, var(--team-a-2) 100%);
   color: white;
   padding: 22px 50px;
   display: flex; align-items: center; gap: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.hint-header::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0;
+  width: 200px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.12));
+  pointer-events: none;
 }
 .hint-header-bar {
   width: 8px; height: 32px; background: var(--gold);
+  box-shadow: 0 0 14px rgba(230, 179, 74, .8);
 }
 .hint-header-label {
   font-size: 1.1rem; font-weight: 800;
@@ -542,67 +791,104 @@ button { font-family: inherit; }
   font-size: 4rem; font-weight: 700;
   line-height: 1.25;
   color: var(--ink);
+  animation: hintTextIn .8s .15s ease-out both;
+}
+@keyframes hintTextIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .hint-emojis {
   display: flex; justify-content: center; gap: 110px;
   font-size: 11rem;
 }
 .hint-emojis span {
-  animation: emojiPop .75s cubic-bezier(.2,.8,.3,1.4) backwards;
+  animation: emojiPop .85s cubic-bezier(.2,.8,.3,1.4) backwards;
   display: inline-block;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .25));
 }
-.hint-emojis span:nth-child(1) { animation-delay: .1s; }
-.hint-emojis span:nth-child(2) { animation-delay: .3s; }
-.hint-emojis span:nth-child(3) { animation-delay: .5s; }
+.hint-emojis span:nth-child(1) { animation-delay: .15s; }
+.hint-emojis span:nth-child(2) { animation-delay: .35s; }
+.hint-emojis span:nth-child(3) { animation-delay: .55s; }
 @keyframes emojiPop {
   0%   { opacity: 0; transform: scale(0) rotate(-180deg); }
+  60%  { opacity: 1; transform: scale(1.18) rotate(8deg); }
   100% { opacity: 1; transform: scale(1) rotate(0); }
 }
 
 /* ============================================================
-   9. REVEAL OVERLAY — editorial answer card
+   10. REVEAL OVERLAY
 ============================================================ */
 .reveal-overlay {
   flex-direction: column;
   align-items: center; justify-content: center;
   gap: 80px;
-  background: var(--cream);
+  background:
+    radial-gradient(ellipse at center, rgba(230, 179, 74, .15), transparent 70%),
+    radial-gradient(ellipse at center, rgba(42, 26, 74, .55), rgba(7, 24, 43, .92));
   overflow: hidden;
 }
 .reveal-tag {
   display: flex; align-items: center; gap: 22px;
   font-size: 1rem; font-weight: 800;
   letter-spacing: .8em;
-  color: var(--gold);
+  color: var(--gold-2);
   text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(230, 179, 74, .6);
+  animation: tagSlideIn .7s ease-out both;
+}
+@keyframes tagSlideIn {
+  from { opacity: 0; transform: translateY(-16px); letter-spacing: 1.2em; }
+  to   { opacity: 1; transform: translateY(0); letter-spacing: .8em; }
 }
 .reveal-tag::before, .reveal-tag::after {
-  content: ""; width: 70px; height: 1.5px; background: var(--gold);
+  content: ""; width: 80px; height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 .reveal-word-wrap {
   display: flex; flex-direction: column; align-items: center; gap: 24px;
   margin-top: -30px;
+  position: relative;
+}
+.reveal-word-wrap::before {
+  content: ""; position: absolute; inset: -10% -20%;
+  background: radial-gradient(ellipse, rgba(230, 179, 74, .25), transparent 65%);
+  pointer-events: none;
+  animation: revealGlow 2.5s ease-in-out infinite alternate;
+}
+@keyframes revealGlow {
+  from { opacity: .55; transform: scale(.97); }
+  to   { opacity: 1;   transform: scale(1.03); }
 }
 .reveal-word {
   font-family: var(--serif);
   font-size: 14rem; font-weight: 900;
   line-height: 1;
   letter-spacing: -.02em;
-  color: var(--ink);
+  color: var(--paper);
   text-align: center;
   padding: 0 40px;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, #fff8e2 0%, #f5d77f 50%, #e6b34a 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, .55))
+          drop-shadow(0 0 36px rgba(230, 179, 74, .55));
   animation: revealZoom 1s cubic-bezier(.2,.8,.3,1.4) both;
 }
 @keyframes revealZoom {
-  0%   { transform: scale(0.5); opacity: 0; }
-  60%  { transform: scale(1.08); opacity: 1; }
-  100% { transform: scale(1);    opacity: 1; }
+  0%   { transform: scale(0.4) rotate(-4deg); opacity: 0; }
+  60%  { transform: scale(1.12) rotate(0);    opacity: 1; }
+  100% { transform: scale(1) rotate(0);       opacity: 1; }
 }
 .reveal-underline {
-  width: 200px; height: 4px;
-  background: var(--gold);
+  width: 240px; height: 4px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
   animation: lineGrow .7s .8s cubic-bezier(.2,.8,.3,1.2) both;
   transform-origin: center;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 20px rgba(230, 179, 74, .8);
 }
 @keyframes lineGrow {
   from { transform: scaleX(0); }
@@ -611,44 +897,64 @@ button { font-family: inherit; }
 .point-buttons {
   display: flex; gap: 60px;
   margin-top: 10px;
+  position: relative; z-index: 2;
+  animation: pointsIn .8s .9s ease-out both;
+}
+@keyframes pointsIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .point-btn {
   font-family: var(--sans);
   display: flex; align-items: center; gap: 18px;
   padding: 24px 50px;
-  border: none;
-  border-radius: 6px;
-  background: var(--navy); color: white;
+  border: 2px solid rgba(255, 255, 255, .25);
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--team-a-2) 0%, var(--team-a) 100%);
+  color: white;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform .25s, box-shadow .25s, background .25s;
+  box-shadow: 0 14px 38px rgba(20, 64, 107, .55), inset 0 1px 0 rgba(255, 255, 255, .25);
+  transition: transform .25s, box-shadow .25s;
+  position: relative;
+  overflow: hidden;
 }
-.point-btn:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); background: var(--navy-2); }
-.point-btn.b { background: var(--coral); }
-.point-btn.b:hover { background: var(--coral-2); }
+.point-btn::before {
+  content: ""; position: absolute; top: 0; left: -120%;
+  width: 60%; height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(255,255,255,.35), transparent);
+  transition: left .6s ease;
+}
+.point-btn:hover { transform: translateY(-5px) scale(1.04); box-shadow: 0 22px 54px rgba(20, 64, 107, .75); }
+.point-btn:hover::before { left: 130%; }
+.point-btn.b {
+  background: linear-gradient(180deg, var(--team-b-2) 0%, var(--team-b) 100%);
+  box-shadow: 0 14px 38px rgba(238, 91, 60, .55), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+.point-btn.b:hover { box-shadow: 0 22px 54px rgba(238, 91, 60, .75); }
 .point-btn-num {
   font-family: var(--serif);
-  font-size: 2.4rem; font-weight: 900;
+  font-size: 2.6rem; font-weight: 900;
   line-height: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .35);
 }
 .point-btn-text {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
   text-align: left;
 }
 .point-btn-text .small {
-  font-size: .7rem; letter-spacing: .4em; opacity: .8; font-weight: 700;
+  font-size: .7rem; letter-spacing: .4em; opacity: .85; font-weight: 700;
 }
 .point-btn-text .big {
   font-size: 1.4rem; letter-spacing: .15em; font-weight: 800; line-height: 1;
 }
 
-/* paper confetti */
 .paper-confetto {
   position: absolute;
   top: -8vh;
   width: 14px; height: 22px;
   opacity: .92;
   animation: confettiFall linear forwards;
+  z-index: 3;
 }
 @keyframes confettiFall {
   0%   { transform: translateY(-8vh) rotate(0); }
@@ -659,21 +965,25 @@ button { font-family: inherit; }
   width: 10px; height: 10px;
   pointer-events: none;
   animation: sparkleFloat 2.4s ease-out forwards;
+  z-index: 3;
+  box-shadow: 0 0 14px currentColor;
 }
 @keyframes sparkleFloat {
   0%   { transform: translateY(0)    scale(0);   opacity: 1; }
-  60%  { transform: translateY(-220px) scale(1.4); opacity: 1; }
-  100% { transform: translateY(-540px) scale(0);   opacity: 0; }
+  60%  { transform: translateY(-260px) scale(1.6); opacity: 1; }
+  100% { transform: translateY(-600px) scale(0);   opacity: 0; }
 }
 
 /* ============================================================
-   10. FEATURE OVERLAY (video / guest)
+   11. FEATURE OVERLAY (video / guest)
 ============================================================ */
 .feature-overlay {
   flex-direction: column;
   align-items: center; justify-content: center;
   gap: 40px;
-  background: var(--cream);
+  background:
+    radial-gradient(ellipse at top, rgba(20, 64, 107, .35), transparent 60%),
+    rgba(7, 24, 43, .9);
   padding: 40px;
 }
 .feature-tag {
@@ -685,7 +995,8 @@ button { font-family: inherit; }
   font-size: .9rem; font-weight: 800;
   letter-spacing: .55em;
   text-transform: uppercase;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 0 22px rgba(238, 91, 60, .55), var(--shadow-sm);
+  animation: liveGlow 2s ease-in-out infinite alternate;
 }
 .live-dot {
   width: 12px; height: 12px;
@@ -694,14 +1005,16 @@ button { font-family: inherit; }
 }
 .video-frame {
   width: 1500px;
-  background: var(--paper);
+  background: linear-gradient(180deg, var(--paper), var(--paper-2));
   padding: 14px;
-  border-radius: 8px;
-  box-shadow: var(--shadow-lg);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(230, 179, 74, .25);
+  border: 2px solid rgba(230, 179, 74, .35);
+  animation: hintIn .6s cubic-bezier(.2,.8,.3,1.2) both;
 }
 .video-frame-inner {
   width: 100%; aspect-ratio: 16 / 9;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: hidden;
   background: #000;
 }
@@ -709,19 +1022,31 @@ button { font-family: inherit; }
 
 .guest-card {
   width: 1400px;
-  background: var(--paper);
-  border-radius: 8px;
-  box-shadow: var(--shadow-lg);
+  background: linear-gradient(180deg, var(--paper), var(--paper-2));
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg), 0 0 50px rgba(230, 179, 74, .3);
   overflow: hidden;
   animation: hintIn .6s cubic-bezier(.2,.8,.3,1.2) both;
+  border: 2px solid rgba(230, 179, 74, .35);
 }
 .guest-header {
-  background: var(--navy);
+  background: linear-gradient(90deg, var(--team-a) 0%, var(--team-a-2) 100%);
   color: white;
   padding: 24px 60px;
   display: flex; align-items: center; gap: 22px;
+  position: relative;
+  overflow: hidden;
 }
-.guest-header-bar { width: 8px; height: 32px; background: var(--gold); }
+.guest-header::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0;
+  width: 220px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.12));
+  pointer-events: none;
+}
+.guest-header-bar {
+  width: 8px; height: 32px; background: var(--gold);
+  box-shadow: 0 0 14px rgba(230, 179, 74, .8);
+}
 .guest-header-label {
   font-size: 1.1rem; font-weight: 800;
   letter-spacing: .6em;
@@ -742,8 +1067,20 @@ button { font-family: inherit; }
   display: flex; align-items: center; justify-content: center;
   font-family: var(--serif);
   font-size: 7rem; font-weight: 800;
-  color: var(--gold);
-  box-shadow: inset 0 0 0 8px var(--paper);
+  color: var(--gold-deep);
+  box-shadow:
+    inset 0 0 0 8px var(--paper),
+    0 0 30px rgba(230, 179, 74, .5);
+  animation: photoSpin 18s linear infinite;
+}
+@keyframes photoSpin {
+  /* very slow rotating gold ring effect */
+  from { box-shadow: inset 0 0 0 8px var(--paper),
+                     0 0 30px rgba(230, 179, 74, .5); }
+  50%  { box-shadow: inset 0 0 0 8px var(--paper),
+                     0 0 50px rgba(230, 179, 74, .9); }
+  to   { box-shadow: inset 0 0 0 8px var(--paper),
+                     0 0 30px rgba(230, 179, 74, .5); }
 }
 .guest-text { display: flex; flex-direction: column; gap: 18px; }
 .guest-name {
@@ -757,14 +1094,14 @@ button { font-family: inherit; }
   display: flex; align-items: center; gap: 14px;
   font-size: .85rem; font-weight: 800;
   letter-spacing: .4em;
-  color: var(--gold);
+  color: var(--gold-deep);
   text-transform: uppercase;
 }
 .guest-meta::before { content: ""; width: 26px; height: 2px; background: var(--gold); }
 .guest-word {
   font-family: var(--serif);
   font-size: 2.6rem; font-weight: 700;
-  color: var(--navy);
+  color: var(--team-a);
   letter-spacing: .02em;
 }
 
@@ -773,24 +1110,33 @@ button { font-family: inherit; }
   font-size: 1rem; font-weight: 800;
   letter-spacing: .35em;
   padding: 18px 40px;
-  background: var(--ink); color: white;
-  border: none; border-radius: 6px;
+  background: linear-gradient(180deg, var(--ink) 0%, #0c1626 100%);
+  color: var(--gold-2);
+  border: 2px solid rgba(230, 179, 74, .45);
+  border-radius: 8px;
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow), 0 0 18px rgba(230, 179, 74, .25);
   transition: transform .2s, background .25s, box-shadow .25s;
   text-transform: uppercase;
   display: inline-flex; align-items: center; gap: 14px;
 }
-.back-board-btn:hover { transform: translateY(-3px); background: var(--navy); box-shadow: var(--shadow); }
+.back-board-btn:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, var(--team-a) 0%, var(--team-a-2) 100%);
+  box-shadow: var(--shadow-lg), 0 0 28px rgba(230, 179, 74, .45);
+  color: white;
+}
 
 /* ============================================================
-   11. WINNER OVERLAY — editorial result
+   12. WINNER OVERLAY
 ============================================================ */
 .winner-overlay {
   flex-direction: column;
   align-items: center; justify-content: center;
   gap: 40px;
-  background: var(--cream);
+  background:
+    radial-gradient(ellipse at center, rgba(230, 179, 74, .2), transparent 65%),
+    radial-gradient(ellipse at center, rgba(42, 26, 74, .5), rgba(7, 24, 43, .92));
   overflow: hidden;
   transition: opacity .9s ease-out;
 }
@@ -799,18 +1145,20 @@ button { font-family: inherit; }
   display: flex; align-items: center; gap: 24px;
   font-size: 1rem; font-weight: 800;
   letter-spacing: .8em;
-  color: var(--gold);
+  color: var(--gold-2);
   text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(230, 179, 74, .6);
 }
 .winner-tag::before, .winner-tag::after {
-  content: ""; width: 80px; height: 1.5px; background: var(--gold);
+  content: ""; width: 80px; height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 .winner-stack { display: flex; flex-direction: column; align-items: center; gap: 18px; }
 .winner-eyebrow {
   font-family: var(--sans);
   font-size: 1.6rem; font-weight: 700;
   letter-spacing: .5em;
-  color: var(--ink-soft);
+  color: var(--gold-2);
   text-transform: uppercase;
 }
 .winner-team-name {
@@ -819,21 +1167,45 @@ button { font-family: inherit; }
   letter-spacing: -.02em;
   line-height: .95;
   text-align: center;
-  animation: revealZoom 1.1s cubic-bezier(.2,.8,.3,1.2) both;
+  animation: winnerZoom 1.2s cubic-bezier(.2,.8,.3,1.4) both;
+  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, .55))
+          drop-shadow(0 0 40px rgba(230, 179, 74, .55));
 }
-.winner-team-name.team-a { color: var(--navy); }
-.winner-team-name.team-b { color: var(--coral); }
-.winner-team-name.tie    { color: var(--ink); font-size: 8rem; }
+@keyframes winnerZoom {
+  0%   { transform: scale(0.3) rotate(-8deg); opacity: 0; }
+  60%  { transform: scale(1.15) rotate(0);    opacity: 1; }
+  100% { transform: scale(1) rotate(0);       opacity: 1; }
+}
+.winner-team-name.team-a {
+  background: linear-gradient(180deg, #6fb1f0 0%, #1f5c97 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.winner-team-name.team-b {
+  background: linear-gradient(180deg, #ff9b7e 0%, #d83a1c 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.winner-team-name.tie {
+  font-size: 8rem;
+  background: linear-gradient(180deg, #fff8e2 0%, #e6b34a 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 .winner-rule {
-  width: 240px; height: 4px; background: var(--gold);
+  width: 280px; height: 4px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
   animation: lineGrow .7s .9s cubic-bezier(.2,.8,.3,1.2) both;
+  box-shadow: 0 0 18px rgba(230, 179, 74, .8);
 }
 .final-scores-card {
-  background: var(--paper);
+  background: linear-gradient(180deg, var(--paper), var(--paper-2));
   padding: 28px 50px;
-  border-radius: 8px;
-  box-shadow: var(--shadow);
+  border-radius: 10px;
+  box-shadow: var(--shadow), 0 0 30px rgba(230, 179, 74, .25);
   display: flex; align-items: center; gap: 60px;
+  border: 2px solid rgba(230, 179, 74, .3);
+  animation: hintIn .6s .8s cubic-bezier(.2,.8,.3,1.2) backwards;
 }
 .fs-team {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
@@ -845,8 +1217,8 @@ button { font-family: inherit; }
   color: var(--ink-soft);
   text-transform: uppercase;
 }
-.fs-team-tag.a { color: var(--navy); }
-.fs-team-tag.b { color: var(--coral); }
+.fs-team-tag.a { color: var(--team-a); }
+.fs-team-tag.b { color: var(--team-b); }
 .fs-team-num {
   font-family: var(--serif);
   font-size: 5rem; font-weight: 900;
@@ -864,24 +1236,29 @@ button { font-family: inherit; }
   letter-spacing: .4em;
   text-transform: uppercase;
   padding: 22px 56px;
-  background: var(--navy); color: white;
-  border: none; border-radius: 6px;
+  background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%);
+  color: var(--ink);
+  border: 2px solid rgba(255, 248, 226, .55);
+  border-radius: 8px;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform .25s, background .25s, box-shadow .25s;
+  box-shadow: 0 14px 38px rgba(184, 134, 46, .55);
+  transition: transform .25s, box-shadow .25s, filter .25s;
   display: inline-flex; align-items: center; gap: 16px;
+  animation: btnPulse 2.4s ease-in-out infinite;
 }
-.continue-btn:hover { transform: translateY(-3px); background: var(--navy-2); box-shadow: var(--shadow-lg); }
+.continue-btn:hover { transform: translateY(-3px) scale(1.04); filter: brightness(1.1); }
 .continue-btn-arrow { font-size: 1.1rem; }
 
 /* ============================================================
-   12. SEGUE — "Coming Up Next" hold graphic
+   13. SEGUE
 ============================================================ */
 .segue-overlay {
   flex-direction: column;
   align-items: center; justify-content: center;
   gap: 36px;
-  background: var(--cream);
+  background:
+    radial-gradient(ellipse at center, rgba(20, 64, 107, .4), transparent 65%),
+    rgba(7, 24, 43, .95);
   overflow: hidden;
 }
 .segue-overlay.active {
@@ -895,23 +1272,30 @@ button { font-family: inherit; }
   display: flex; align-items: center; gap: 30px;
   font-size: .95rem; font-weight: 800;
   letter-spacing: .8em;
-  color: var(--gold);
+  color: var(--gold-2);
   text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(230, 179, 74, .6);
 }
 .segue-mark::before, .segue-mark::after {
-  content: ""; width: 100px; height: 1.5px; background: var(--gold);
+  content: ""; width: 110px; height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 .segue-logo {
   font-family: var(--serif);
   font-size: 13rem; font-weight: 900;
   line-height: .9;
   letter-spacing: -.02em;
-  color: var(--ink);
   text-align: center;
+  background: linear-gradient(180deg, #fff8e2 0%, #f5d77f 50%, #e6b34a 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, .55))
+          drop-shadow(0 0 36px rgba(230, 179, 74, .45));
 }
 .segue-rule {
   width: 280px; height: 3px;
-  background: var(--gold);
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  box-shadow: 0 0 14px rgba(230, 179, 74, .7);
 }
 .segue-up-next {
   display: flex; flex-direction: column; align-items: center; gap: 14px;
@@ -921,24 +1305,24 @@ button { font-family: inherit; }
   font-family: var(--sans);
   font-size: 1.05rem; font-weight: 700;
   letter-spacing: .55em;
-  color: var(--ink-soft);
+  color: var(--gold-2);
   text-transform: uppercase;
 }
 .segue-up-next-title {
   font-family: var(--serif);
   font-size: 3.4rem; font-weight: 700;
-  color: var(--ink);
+  color: var(--paper);
   letter-spacing: -.005em;
   text-align: center;
-  /* PLACEHOLDER text — replace this in HTML for your next class activity */
 }
 .segue-thanks {
   margin-top: 30px;
   font-family: var(--sans);
   font-size: .9rem; font-weight: 700;
   letter-spacing: .65em;
-  color: var(--ink-soft);
+  color: var(--gold-2);
   text-transform: uppercase;
+  opacity: .85;
 }
 .segue-restart {
   position: absolute;
@@ -946,23 +1330,23 @@ button { font-family: inherit; }
   font-family: var(--sans);
   font-size: .7rem; font-weight: 700;
   letter-spacing: .35em;
-  color: var(--ink-soft);
-  background: transparent;
-  border: 1px solid var(--hairline);
+  color: var(--gold-2);
+  background: rgba(7, 24, 43, .55);
+  border: 1px solid rgba(230, 179, 74, .45);
   padding: 11px 18px;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   text-transform: uppercase;
   transition: color .2s, border-color .2s, background .2s;
 }
 .segue-restart:hover {
   color: var(--ink);
-  border-color: var(--ink);
-  background: var(--paper);
+  border-color: var(--gold);
+  background: var(--gold-2);
 }
 
 /* ============================================================
-   13. FLOATING CONTROLS — Next button + step indicator
+   14. FLOATING CONTROLS — Back / Next / step indicator
 ============================================================ */
 .controls {
   position: absolute;
@@ -974,46 +1358,84 @@ button { font-family: inherit; }
   font-family: var(--sans);
   font-size: .72rem; font-weight: 800;
   letter-spacing: .4em;
-  color: var(--ink-soft);
-  background: var(--paper);
-  padding: 9px 14px;
-  border-radius: 4px;
+  color: var(--gold-2);
+  background: rgba(7, 24, 43, .85);
+  padding: 10px 16px;
+  border-radius: 6px;
   text-transform: uppercase;
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--hairline);
+  border: 1px solid rgba(230, 179, 74, .35);
+  backdrop-filter: blur(4px);
 }
-.next-btn {
+.ctrl-btn {
   font-family: var(--sans);
-  display: inline-flex; align-items: center; gap: 14px;
-  font-size: .95rem; font-weight: 800;
+  display: inline-flex; align-items: center; gap: 12px;
+  font-size: .9rem; font-weight: 800;
   letter-spacing: .35em;
-  padding: 16px 32px;
-  border: none;
-  border-radius: 6px;
+  padding: 14px 26px;
+  border: 2px solid rgba(230, 179, 74, .35);
+  border-radius: 8px;
   cursor: pointer;
-  background: var(--navy); color: white;
+  background: linear-gradient(180deg, rgba(20, 64, 107, .85), rgba(7, 24, 43, .95));
+  color: var(--gold-2);
   box-shadow: var(--shadow);
-  transition: transform .2s, background .25s, box-shadow .25s;
+  transition: transform .2s, background .25s, box-shadow .25s, color .25s;
   text-transform: uppercase;
+  backdrop-filter: blur(4px);
 }
-.next-btn:hover {
+.ctrl-btn:hover {
   transform: translateY(-2px);
-  background: var(--navy-2);
-  box-shadow: var(--shadow-lg);
+  background: linear-gradient(180deg, var(--team-a-2), var(--team-a));
+  box-shadow: var(--shadow-lg), 0 0 22px rgba(230, 179, 74, .35);
+  color: var(--paper);
 }
-.next-btn .kbd {
-  font-size: .6rem;
+.ctrl-btn.next-btn {
+  background: linear-gradient(180deg, var(--gold-2), var(--gold));
+  color: var(--ink);
+  border-color: rgba(255, 248, 226, .55);
+  box-shadow: 0 10px 28px rgba(184, 134, 46, .45);
+}
+.ctrl-btn.next-btn:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 14px 36px rgba(184, 134, 46, .65);
+  color: var(--ink);
+}
+.ctrl-btn.hidden { display: none; }
+.ctrl-btn .kbd {
+  font-size: .58rem;
   letter-spacing: .15em;
-  padding: 4px 9px;
-  border: 1px solid rgba(255,255,255,.4);
+  padding: 4px 8px;
+  border: 1px solid currentColor;
   border-radius: 3px;
   font-weight: 700;
+  opacity: .75;
 }
-.next-btn .arrow { font-size: 1.05rem; }
-.next-btn.hidden { display: none; }
+.ctrl-btn .arrow { font-size: 1.05rem; }
+
+/* sound-off pill */
+.sound-toggle {
+  position: absolute;
+  top: 24px; right: 24px;
+  z-index: 95;
+  font-family: var(--sans);
+  font-size: .6rem; font-weight: 800;
+  letter-spacing: .3em;
+  color: var(--gold-2);
+  background: rgba(7, 24, 43, .7);
+  border: 1px solid rgba(230, 179, 74, .35);
+  border-radius: 50%;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background .25s, color .25s, transform .2s;
+  backdrop-filter: blur(4px);
+}
+.sound-toggle:hover { background: var(--gold-2); color: var(--ink); transform: scale(1.05); }
+.sound-toggle .icon { font-size: 1.1rem; }
 
 /* ============================================================
-   14. UTILITIES
+   15. UTILITIES
 ============================================================ */
 .sr { position: absolute; left: -9999px; }
 </style>
@@ -1023,21 +1445,26 @@ button { font-family: inherit; }
 <div class="stage-wrap">
   <div class="stage" id="stage">
 
+    <!-- ambient particles layer -->
+    <div class="ambient" id="ambient"></div>
+
+    <!-- marquee bulbs around stage edges -->
+    <div class="marquee top"    id="marquee-top"></div>
+    <div class="marquee bottom" id="marquee-bottom"></div>
+    <div class="marquee left"   id="marquee-left"></div>
+    <div class="marquee right"  id="marquee-right"></div>
+
     <!-- ================================================
-         AUDIO — replace src files with your own
+         AUDIO — sound effects are SYNTHESIZED via Web Audio API
+         (no external mp3 files needed). Theme song slot is
+         retained as an optional drop-in.
     ================================================ -->
     <audio id="theme-song" loop>
       <source src="REPLACE_WITH_THEME_SONG.mp3" type="audio/mpeg">
     </audio>
-    <audio id="logo-flash-sound">
-      <source src="REPLACE_WITH_LOGO_FLASH_SOUND.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="reveal-sound">
-      <source src="REPLACE_WITH_REVEAL_SOUND.mp3" type="audio/mpeg">
-    </audio>
 
     <!-- ================================================
-         SCOREBOARD — broadcast lower-third (top of stage)
+         SCOREBOARD
     ================================================ -->
     <div class="scoreboard" id="scoreboard">
       <div class="team a">
@@ -1074,7 +1501,7 @@ button { font-family: inherit; }
     </div>
 
     <!-- ================================================
-         BOARD (crossword) — persistent under overlays
+         BOARD (crossword)
     ================================================ -->
     <div class="board" id="board">
       <div class="board-mark">El Crucigrama · The Crossword</div>
@@ -1083,11 +1510,11 @@ button { font-family: inherit; }
       </div>
     </div>
 
-    <!-- presenter cue (no on-screen hint, words 3 & 4) -->
+    <!-- presenter cue -->
     <div class="presenter-cue" id="presenter-cue">El presentador introduce la palabra</div>
 
     <!-- ================================================
-         LAYERS — overlays
+         OVERLAYS / LAYERS
     ================================================ -->
     <div class="layer preshow active" id="preshow">
       <div class="on-air"><span class="on-air-dot"></span> ON AIR</div>
@@ -1217,19 +1644,28 @@ button { font-family: inherit; }
       <div class="segue-rule"></div>
       <div class="segue-up-next">
         <div class="segue-up-next-label">Más a continuación · Up Next</div>
-        <!-- PLACEHOLDER — change this line to whatever class activity comes next -->
+        <!-- PLACEHOLDER — change for your next class activity -->
         <div class="segue-up-next-title" id="up-next-title">Conversation Practice</div>
       </div>
       <div class="segue-thanks">Gracias por jugar · Thank you for playing</div>
       <button class="segue-restart" onclick="location.reload()">↺ Restart Show</button>
     </div>
 
+    <!-- sound on/off pill -->
+    <button class="sound-toggle" id="sound-toggle" title="Toggle sound">
+      <span class="icon" id="sound-icon">♪</span>
+    </button>
+
     <!-- ================================================
-         FLOATING CONTROLS
+         FLOATING CONTROLS — back / step / next
     ================================================ -->
     <div class="controls" id="controls">
+      <button class="ctrl-btn back-btn hidden" id="back-btn">
+        <span class="arrow">◂</span>
+        Back
+      </button>
       <div class="step-indicator" id="step-indicator">Step 1 / 25</div>
-      <button class="next-btn hidden" id="next-btn">
+      <button class="ctrl-btn next-btn hidden" id="next-btn">
         Next
         <span class="kbd">Space</span>
         <span class="arrow">▸</span>
@@ -1244,32 +1680,7 @@ button { font-family: inherit; }
 
 /* =====================================================================
    1. WORD DATA — placeholders are clearly marked. Grid is hardcoded so
-      these four words PHYSICALLY intersect. Their shared cells are
-      rendered exactly once so they share the letter tile in the DOM.
-
-        Col:    0 1 2 3 4 5 6 7 8 9 10 11 12
-        Row 0:  · · · · I · · · · · ·  ·  ·
-        Row 1:  · · · · N · · · · · ·  ·  ·
-        Row 2:  · · · · G · · · · · ·  ·  ·
-        Row 3:  · S U P E R M E R C A  D  O   ← #1 SUPERMERCADO (across)
-        Row 4:  · · · R N · · · · · ·  ·  ·
-        Row 5:  · · · O I · · · · · ·  ·  ·
-        Row 6:  · · · F E · · · · · ·  ·  ·
-        Row 7:  J O Y E R Í A · · · ·  ·  ·   ← #2 JOYERÍA (across)
-        Row 8:  · · · S O · · · · · ·  ·  ·
-        Row 9:  · · · O · · · · · · ·  ·  ·
-        Row 10: · · · R · · · · · · ·  ·  ·
-        Row 11: · · · A · · · · · · ·  ·  ·
-
-      Vertical words:
-        #3 PROFESORA — col 3, rows 3..11
-        #4 INGENIERO — col 4, rows 0..8
-
-      Intersections (one DOM cell shared):
-        (3, 3) — SUPERMERCADO[2]=P  ∩  PROFESORA[0]=P
-        (3, 4) — SUPERMERCADO[3]=E  ∩  INGENIERO[3]=E
-        (7, 3) — JOYERÍA[3]=E       ∩  PROFESORA[4]=E
-        (7, 4) — JOYERÍA[4]=R       ∩  INGENIERO[7]=R
+      these four words PHYSICALLY intersect.
    ===================================================================== */
 const WORDS = [
   {
@@ -1278,7 +1689,7 @@ const WORDS = [
     direction: "horizontal",
     startRow: 3, startCol: 1,
     hint:    { kind: "text", value: "Aquí compras tu comida cada semana. Tiene pasillos, carritos y cajeros." },
-    feature: { kind: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" } // PLACEHOLDER
+    feature: { kind: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" }
   },
   {
     id: 2,
@@ -1286,7 +1697,7 @@ const WORDS = [
     direction: "horizontal",
     startRow: 7, startCol: 0,
     hint:    { kind: "emojis", value: ["💍", "💎", "⌚"] },
-    feature: { kind: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" } // PLACEHOLDER
+    feature: { kind: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" }
   },
   {
     id: 3,
@@ -1294,7 +1705,7 @@ const WORDS = [
     direction: "vertical",
     startRow: 3, startCol: 3,
     hint:    { kind: "none" },
-    feature: { kind: "guest", name: "Sra. García", initial: "G" } // PLACEHOLDER
+    feature: { kind: "guest", name: "Sra. García", initial: "G" }
   },
   {
     id: 4,
@@ -1302,7 +1713,7 @@ const WORDS = [
     direction: "vertical",
     startRow: 0, startCol: 4,
     hint:    { kind: "none" },
-    feature: { kind: "guest", name: "Sr. Rodríguez", initial: "R" } // PLACEHOLDER
+    feature: { kind: "guest", name: "Sr. Rodríguez", initial: "R" }
   }
 ];
 
@@ -1322,9 +1733,9 @@ window.addEventListener("resize", scaleStage);
 scaleStage();
 
 /* =====================================================================
-   3. CROSSWORD — build once, share intersection cells
+   3. CROSSWORD
    ===================================================================== */
-const lettersOf = w => Array.from(w);   // splits "JOYERÍA" correctly into 7 chars
+const lettersOf = w => Array.from(w);
 function cellsForWord(w) {
   const letters = lettersOf(w.word);
   const cells = [];
@@ -1336,9 +1747,6 @@ function cellsForWord(w) {
   return cells;
 }
 
-/* gridMap: "r,c" → { letter, headForWords:[wordId] } — one entry per
-   distinct (r,c). Intersection cells appear ONCE so the DOM tile is
-   physically shared. */
 const gridMap = {};
 WORDS.forEach(w => {
   cellsForWord(w).forEach((cell, i) => {
@@ -1397,6 +1805,7 @@ function fillWord(idx) {
       el.classList.add("filled");
       const span = el.querySelector(".letter");
       if (span && !span.textContent) span.textContent = letter;
+      sfx.tick(0.04 + i * 0.005, 800 + i * 80);
     }, i * 75);
   });
 }
@@ -1422,8 +1831,10 @@ STEPS.push({ kind: "segue"  });
 const state = {
   step: 0,
   scores: { a: 0, b: 0 },
+  scoreHistory: [],   // stack of awarded teams to support back-undo
   pendingTimeout: null,
   isFading: false,
+  soundOn: true,
 };
 
 const els = {
@@ -1461,10 +1872,12 @@ const els = {
   controls:       document.getElementById("controls"),
   stepIndicator:  document.getElementById("step-indicator"),
   nextBtn:        document.getElementById("next-btn"),
+  backBtn:        document.getElementById("back-btn"),
   presenterCue:   document.getElementById("presenter-cue"),
   themeSong:      document.getElementById("theme-song"),
-  flashSound:     document.getElementById("logo-flash-sound"),
-  revealSound:    document.getElementById("reveal-sound"),
+  ambient:        document.getElementById("ambient"),
+  soundToggle:    document.getElementById("sound-toggle"),
+  soundIcon:      document.getElementById("sound-icon"),
 };
 
 function clearOverlays() {
@@ -1479,6 +1892,7 @@ function showBoardChrome() { els.scoreboard.classList.add("active"); els.board.c
 function hideBoardChrome() { els.scoreboard.classList.remove("active"); els.board.classList.remove("active"); }
 function clearAutoTimer()  { if (state.pendingTimeout) { clearTimeout(state.pendingTimeout); state.pendingTimeout = null; } }
 function tryPlay(audio, vol = 1) {
+  if (!state.soundOn) return;
   try { audio.currentTime = 0; audio.volume = vol; audio.play().catch(() => {}); } catch (_) {}
 }
 
@@ -1488,6 +1902,7 @@ function applyStep() {
   els.presenterCue.classList.remove("active");
   els.stepIndicator.textContent = `Step ${state.step + 1} / ${STEPS.length}`;
   els.nextBtn.classList.remove("hidden");
+  els.backBtn.classList.toggle("hidden", state.step === 0);
   els.controls.style.display = "flex";
 
   const step = STEPS[state.step];
@@ -1497,13 +1912,14 @@ function applyStep() {
       hideBoardChrome();
       els.preshow.classList.add("active");
       els.nextBtn.classList.add("hidden");
+      els.backBtn.classList.add("hidden");
       break;
 
     case "countdown":
       hideBoardChrome();
       els.countdown.classList.add("active");
       els.nextBtn.classList.add("hidden");
-      tryPlay(els.themeSong, 0.7);
+      tryPlay(els.themeSong, 0.5);
       runCountdown();
       break;
 
@@ -1511,6 +1927,7 @@ function applyStep() {
       hideBoardChrome();
       els.introLogo.classList.add("active");
       els.nextBtn.classList.add("hidden");
+      sfx.fanfare();
       state.pendingTimeout = setTimeout(advance, 2600);
       break;
 
@@ -1518,6 +1935,7 @@ function applyStep() {
       showBoardChrome();
       clearAllHighlights();
       highlightWord(step.wordIdx);
+      sfx.shimmer();
       break;
 
     case "hint": {
@@ -1529,14 +1947,19 @@ function applyStep() {
         els.hintText.style.display = "";
         els.hintEmojis.style.display = "none";
         els.hintText.textContent = w.hint.value;
+        sfx.swoosh();
       } else if (w.hint.kind === "emojis") {
         els.hintOverlay.classList.add("active");
         els.hintText.style.display = "none";
         els.hintEmojis.style.display = "flex";
         els.hintEmojis.innerHTML = w.hint.value.map(e => `<span>${e}</span>`).join("");
+        sfx.swoosh();
+        setTimeout(() => sfx.tick(0.06, 880), 150);
+        setTimeout(() => sfx.tick(0.06, 1100), 350);
+        setTimeout(() => sfx.tick(0.06, 1320), 550);
       } else {
-        // No on-screen hint: presenter cue badge over the board.
         els.presenterCue.classList.add("active");
+        sfx.click();
       }
       break;
     }
@@ -1548,10 +1971,10 @@ function applyStep() {
       els.revealOverlay.classList.add("active");
       els.revealWord.textContent = w.word;
       fillWord(step.wordIdx);
-      spawnSparkles(50);
-      spawnRevealConfetti(60);
-      tryPlay(els.revealSound, 0.85);
-      els.nextBtn.classList.add("hidden"); // must click +1 POINT
+      spawnSparkles(60);
+      spawnRevealConfetti(70);
+      sfx.reveal();
+      els.nextBtn.classList.add("hidden");
       break;
     }
 
@@ -1559,7 +1982,7 @@ function applyStep() {
       showBoardChrome();
       els.logoFlash.classList.add("active");
       els.nextBtn.classList.add("hidden");
-      tryPlay(els.flashSound, 0.85);
+      sfx.whoosh();
       state.pendingTimeout = setTimeout(advance, 1500);
       break;
 
@@ -1567,6 +1990,7 @@ function applyStep() {
       showBoardChrome();
       const w = WORDS[step.wordIdx];
       els.featureOverlay.classList.add("active");
+      sfx.swoosh();
       if (w.feature.kind === "video") {
         els.featureVideo.style.display = "flex";
         els.featureGuest.style.display = "none";
@@ -1587,6 +2011,7 @@ function applyStep() {
       hideBoardChrome();
       els.winnerOverlay.classList.add("active");
       els.nextBtn.classList.add("hidden");
+      els.backBtn.classList.add("hidden");
 
       const a = state.scores.a, b = state.scores.b;
       let teamName, teamClass;
@@ -1598,10 +2023,9 @@ function applyStep() {
       els.fsTeamA.textContent = a;
       els.fsTeamB.textContent = b;
 
-      // gentle confetti on winner reveal
-      spawnWinnerConfetti(80);
+      spawnWinnerConfetti(100);
+      sfx.victory();
 
-      // fade theme music out
       try {
         const t = els.themeSong;
         const f = setInterval(() => {
@@ -1614,8 +2038,9 @@ function applyStep() {
 
     case "segue":
       hideBoardChrome();
-      els.controls.style.display = "none"; // controls disappear so the bumper is clean
+      els.controls.style.display = "none";
       els.segueOverlay.classList.add("active");
+      sfx.shimmer();
       break;
   }
 }
@@ -1626,10 +2051,9 @@ function applyStep() {
 function advance() {
   if (state.isFading) return;
   const step = STEPS[state.step];
-  if (step.kind === "reveal") return;        // requires +1 Point click
-  if (step.kind === "segue")  return;        // segue is the end-of-segment hold
+  if (step.kind === "reveal") return;
+  if (step.kind === "segue")  return;
 
-  // graceful cross-fade from winner → segue
   if (step.kind === "winner") {
     state.isFading = true;
     els.winnerOverlay.classList.add("fading");
@@ -1643,31 +2067,68 @@ function advance() {
 
   if (state.step < STEPS.length - 1) {
     state.step++;
+    sfx.click();
     applyStep();
   }
 }
 
-document.getElementById("start-btn").addEventListener("click", advance);
+function goBack() {
+  if (state.isFading) return;
+  if (state.step === 0) return;
+  // If we're going back across a reveal that awarded a point, undo it.
+  // The reveal step is followed by transition; if previous step is transition
+  // and the one before that was a reveal whose point was awarded, undo.
+  // Simpler: pop the most recent score award if the step we're about to land on
+  // is a reveal we already passed.
+  state.step--;
+  // If we just landed on a "transition" or anything that came AFTER a reveal,
+  // we don't undo. We undo only when stepping back into / past a reveal.
+  // The natural rule: if the step we're now on is "reveal", undo last score.
+  if (STEPS[state.step].kind === "reveal" && state.scoreHistory.length > 0) {
+    const lastTeam = state.scoreHistory.pop();
+    state.scores[lastTeam] = Math.max(0, state.scores[lastTeam] - 1);
+    const el = lastTeam === "a" ? els.scoreA : els.scoreB;
+    el.textContent = state.scores[lastTeam];
+  }
+  sfx.back();
+  applyStep();
+}
+
+document.getElementById("start-btn").addEventListener("click", () => {
+  // user-gesture unlock for audio
+  ensureAudioCtx();
+  sfx.click();
+  advance();
+});
 els.nextBtn.addEventListener("click", advance);
+els.backBtn.addEventListener("click", goBack);
 els.backBoardBtn.addEventListener("click", advance);
 els.continueBtn.addEventListener("click", advance);
 els.pointA.addEventListener("click", () => awardPoint("a"));
 els.pointB.addEventListener("click", () => awardPoint("b"));
 
 document.addEventListener("keydown", (e) => {
-  if (e.code !== "Space") return;
-  const t = document.activeElement;
-  if (t && /INPUT|TEXTAREA/.test(t.tagName)) return;
-  e.preventDefault();
-  advance();
+  if (e.code === "Space") {
+    const t = document.activeElement;
+    if (t && /INPUT|TEXTAREA/.test(t.tagName)) return;
+    e.preventDefault();
+    advance();
+  } else if (e.code === "ArrowLeft" || e.code === "Backspace") {
+    e.preventDefault();
+    goBack();
+  } else if (e.code === "KeyM") {
+    toggleSound();
+  }
 });
 
 function awardPoint(team) {
   state.scores[team] += 1;
+  state.scoreHistory.push(team);
   const el = team === "a" ? els.scoreA : els.scoreB;
   el.textContent = state.scores[team];
   el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
   els.videoIframe.src = "";
+  sfx.point(team);
   state.step++;
   applyStep();
 }
@@ -1680,17 +2141,23 @@ function runCountdown() {
     els.countdownNum.style.animation = "none";
     void els.countdownNum.offsetWidth;
     els.countdownNum.style.animation = "";
+    sfx.beep(660, 0.35);
     i++;
     if (i < seq.length) state.pendingTimeout = setTimeout(tick, 1000);
-    else                state.pendingTimeout = setTimeout(advance, 1000);
+    else {
+      state.pendingTimeout = setTimeout(() => {
+        sfx.go();
+        advance();
+      }, 1000);
+    }
   }
   tick();
 }
 
 /* =====================================================================
-   6. PARTICLES — paper confetti / soft sparkles (editorial palette)
+   6. PARTICLES
    ===================================================================== */
-const PAPER_COLORS = ["#14365b","#d34b35","#c9a04a","#4eb89c","#ffffff","#5a657c"];
+const PAPER_COLORS = ["#e6b34a","#ee5b3c","#f5d77f","#3ab59f","#fff8e2","#1f5c97"];
 
 function spawnSparkles(n) {
   const layer = els.revealOverlay;
@@ -1699,8 +2166,10 @@ function spawnSparkles(n) {
     const s = document.createElement("div");
     s.className = "sparkle-paper";
     s.style.left = (Math.random() * 1920) + "px";
-    s.style.top  = (700 + Math.random() * 200) + "px";
-    s.style.background = PAPER_COLORS[Math.floor(Math.random() * PAPER_COLORS.length)];
+    s.style.top  = (700 + Math.random() * 250) + "px";
+    const col = PAPER_COLORS[Math.floor(Math.random() * PAPER_COLORS.length)];
+    s.style.background = col;
+    s.style.color = col;
     s.style.borderRadius = (Math.random() < .5 ? "50%" : "1px");
     s.style.animationDelay = (Math.random() * 0.6) + "s";
     layer.appendChild(s);
@@ -1721,7 +2190,7 @@ function spawnRevealConfetti(n) {
     c.style.animationDuration = (3.5 + Math.random() * 3) + "s";
     c.style.animationDelay = (Math.random() * 0.6) + "s";
     c.style.transform = `rotate(${Math.random() * 360}deg)`;
-    c.style.opacity = (.65 + Math.random() * 0.3).toFixed(2);
+    c.style.opacity = (.7 + Math.random() * 0.3).toFixed(2);
     layer.appendChild(c);
     setTimeout(() => c.remove(), 7000);
   }
@@ -1741,7 +2210,7 @@ function spawnWinnerConfetti(n) {
     c.style.animationDuration = (4 + Math.random() * 3) + "s";
     c.style.animationDelay = (Math.random() * 0.6) + "s";
     c.style.transform = `rotate(${Math.random() * 360}deg)`;
-    c.style.opacity = (.55 + Math.random() * 0.35).toFixed(2);
+    c.style.opacity = (.65 + Math.random() * 0.35).toFixed(2);
     layer.appendChild(c);
     setTimeout(() => c.remove(), 8000);
   }
@@ -1750,7 +2219,7 @@ function spawnWinnerConfetti(n) {
   winnerConfettiTimer = setInterval(() => {
     if (els.winnerOverlay.classList.contains("active")
         && !els.winnerOverlay.classList.contains("fading")) {
-      for (let i = 0; i < 3; i++) piece();
+      for (let i = 0; i < 4; i++) piece();
     } else {
       clearInterval(winnerConfettiTimer); winnerConfettiTimer = null;
     }
@@ -1758,7 +2227,179 @@ function spawnWinnerConfetti(n) {
 }
 
 /* =====================================================================
-   7. INIT
+   7. MARQUEE BULBS + AMBIENT DUST
+   ===================================================================== */
+function buildMarquee() {
+  const horizontalBulbs = 32;
+  const verticalBulbs   = 18;
+  const make = (n, parent) => {
+    for (let i = 0; i < n; i++) {
+      const b = document.createElement("div");
+      b.className = "bulb";
+      b.style.animationDelay = (Math.random() * 1.4) + "s";
+      parent.appendChild(b);
+    }
+  };
+  make(horizontalBulbs, document.getElementById("marquee-top"));
+  make(horizontalBulbs, document.getElementById("marquee-bottom"));
+  make(verticalBulbs,   document.getElementById("marquee-left"));
+  make(verticalBulbs,   document.getElementById("marquee-right"));
+}
+buildMarquee();
+
+function spawnDust() {
+  const layer = els.ambient;
+  const d = document.createElement("div");
+  d.className = "dust";
+  d.style.left = (Math.random() * 1920) + "px";
+  d.style.bottom = "-20px";
+  const sz = 1.5 + Math.random() * 3;
+  d.style.width = sz + "px"; d.style.height = sz + "px";
+  d.style.setProperty("--dx", ((Math.random() - .5) * 240) + "px");
+  d.style.animationDuration = (10 + Math.random() * 12) + "s";
+  d.style.opacity = "1";
+  const palette = ["rgba(245, 215, 127, .9)", "rgba(255, 248, 226, .8)", "rgba(94, 216, 192, .55)", "rgba(255, 122, 91, .55)"];
+  const col = palette[Math.floor(Math.random() * palette.length)];
+  d.style.background = col;
+  d.style.boxShadow = "0 0 10px " + col;
+  layer.appendChild(d);
+  setTimeout(() => d.remove(), 22000);
+}
+setInterval(spawnDust, 280);
+for (let i = 0; i < 20; i++) setTimeout(spawnDust, i * 120);
+
+/* =====================================================================
+   8. WEB AUDIO — synthesized sound effects (no external files needed)
+   ===================================================================== */
+let audioCtx = null;
+function ensureAudioCtx() {
+  if (audioCtx) return audioCtx;
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new Ctx();
+  } catch (_) {}
+  return audioCtx;
+}
+function osc({ type = "sine", freq = 440, dur = 0.2, vol = 0.2,
+               attack = 0.005, release = 0.1, glide = 0, detune = 0, when = 0 } = {}) {
+  if (!state.soundOn) return;
+  const ctx = ensureAudioCtx(); if (!ctx) return;
+  const t0 = ctx.currentTime + when;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(freq, t0);
+  if (glide) o.frequency.exponentialRampToValueAtTime(Math.max(40, freq + glide), t0 + dur);
+  o.detune.setValueAtTime(detune, t0);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + attack);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g).connect(ctx.destination);
+  o.start(t0);
+  o.stop(t0 + dur + 0.05);
+}
+function noise({ dur = 0.3, vol = 0.15, lp = 1500, hp = 200, when = 0 } = {}) {
+  if (!state.soundOn) return;
+  const ctx = ensureAudioCtx(); if (!ctx) return;
+  const t0 = ctx.currentTime + when;
+  const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1);
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  const lpf = ctx.createBiquadFilter(); lpf.type = "lowpass";  lpf.frequency.value = lp;
+  const hpf = ctx.createBiquadFilter(); hpf.type = "highpass"; hpf.frequency.value = hp;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(hpf).connect(lpf).connect(g).connect(ctx.destination);
+  src.start(t0); src.stop(t0 + dur + 0.05);
+}
+const sfx = {
+  click() { osc({ type: "triangle", freq: 720, dur: 0.06, vol: 0.12, glide: -260 }); },
+  back()  { osc({ type: "triangle", freq: 520, dur: 0.07, vol: 0.12, glide: -160 });
+            osc({ type: "triangle", freq: 380, dur: 0.08, vol: 0.10, glide: -120, when: 0.04 }); },
+  tick(vol = 0.06, freq = 880) { osc({ type: "square", freq, dur: 0.05, vol, glide: -200 }); },
+  beep(freq = 660, vol = 0.25) {
+    osc({ type: "square", freq,        dur: 0.18, vol: vol * 0.6 });
+    osc({ type: "sine",   freq: freq*2, dur: 0.18, vol: vol * 0.3 });
+  },
+  go() {
+    osc({ type: "sawtooth", freq: 440, dur: 0.5, vol: 0.18, glide: 320 });
+    osc({ type: "square",   freq: 880, dur: 0.5, vol: 0.10, glide: 320 });
+    setTimeout(() => sfx.fanfare(), 60);
+  },
+  shimmer() {
+    [880, 1100, 1320].forEach((f, i) =>
+      osc({ type: "sine", freq: f, dur: 0.3, vol: 0.08, when: i * 0.06 }));
+  },
+  swoosh() {
+    noise({ dur: 0.45, vol: 0.18, lp: 2200, hp: 400 });
+    osc({ type: "sine", freq: 220, dur: 0.4, vol: 0.07, glide: 480 });
+  },
+  whoosh() {
+    noise({ dur: 0.7, vol: 0.22, lp: 2800, hp: 200 });
+    osc({ type: "sine", freq: 180, dur: 0.7, vol: 0.10, glide: 600 });
+  },
+  reveal() {
+    // bright triumphant chord with bell tail
+    const chord = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
+    chord.forEach((f, i) => {
+      osc({ type: "triangle", freq: f, dur: 1.0, vol: 0.11, attack: 0.01, when: i * 0.05 });
+      osc({ type: "sine",     freq: f, dur: 1.4, vol: 0.05, attack: 0.02, when: i * 0.05 });
+    });
+    noise({ dur: 0.35, vol: 0.10, lp: 8000, hp: 2000 });
+  },
+  fanfare() {
+    // short rising intro motif
+    const seq = [392, 523.25, 659.25, 783.99]; // G4 C5 E5 G5
+    seq.forEach((f, i) =>
+      osc({ type: "triangle", freq: f, dur: 0.22, vol: 0.13, when: i * 0.12 }));
+  },
+  point(team) {
+    const base = team === "a" ? 523.25 : 659.25;
+    osc({ type: "triangle", freq: base,        dur: 0.14, vol: 0.18 });
+    osc({ type: "triangle", freq: base * 1.5,  dur: 0.18, vol: 0.16, when: 0.12 });
+    osc({ type: "sine",     freq: base * 2,    dur: 0.22, vol: 0.10, when: 0.24 });
+  },
+  victory() {
+    // grand fanfare
+    const motif = [
+      [523.25, 0.0], [659.25, 0.18], [783.99, 0.36],
+      [1046.5, 0.54], [783.99, 0.78], [1046.5, 0.96]
+    ];
+    motif.forEach(([f, t]) => {
+      osc({ type: "triangle", freq: f,         dur: 0.3, vol: 0.15, when: t });
+      osc({ type: "sine",     freq: f * 0.5,   dur: 0.3, vol: 0.10, when: t });
+    });
+    // applause-like noise burst that fades
+    noise({ dur: 2.2, vol: 0.18, lp: 4000, hp: 600, when: 0.6 });
+    noise({ dur: 1.8, vol: 0.10, lp: 5500, hp: 800, when: 1.5 });
+  },
+};
+
+/* =====================================================================
+   9. SOUND TOGGLE
+   ===================================================================== */
+function toggleSound() {
+  state.soundOn = !state.soundOn;
+  els.soundIcon.textContent = state.soundOn ? "♪" : "✕";
+  els.soundToggle.title = state.soundOn ? "Sound on (M to mute)" : "Sound off (M to unmute)";
+  if (state.soundOn) sfx.click();
+  if (!state.soundOn) {
+    try { els.themeSong.pause(); } catch (_) {}
+  }
+}
+els.soundToggle.addEventListener("click", toggleSound);
+
+// Subtle hover-tick on big buttons
+[els.nextBtn, els.backBtn, els.pointA, els.pointB, els.continueBtn, els.backBoardBtn,
+ document.getElementById("start-btn")]
+  .filter(Boolean)
+  .forEach(btn => btn.addEventListener("mouseenter", () => sfx.tick(0.04, 1200)));
+
+/* =====================================================================
+   10. INIT
    ===================================================================== */
 applyStep();
 </script>

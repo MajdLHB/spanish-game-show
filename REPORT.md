@@ -4,6 +4,94 @@ A running log of what was built, in plain English. Each entry is dated and self-
 
 ---
 
+## 2026-05-06 (Studio Edition) — Theatrical palette, marquee bulbs, ambient particles, synthesized SFX, Back button
+
+### Goal
+Push the app from "editorial newspaper broadcast" toward an actual evening-game-show stage: rich theatrical jewel-tone palette, animated stage lighting, ambient particles, real sound effects without external mp3 files, and a backward step control so the host can recover from accidental advances or undo a mis-awarded point.
+
+User asks driving this iteration:
+1. **Fit a variety of PC screens** — keep the 16:9 letterbox-scale approach but make sure the surround, controls, and stage all behave well on different monitors.
+2. **Use a real colour palette** — not all-white, and not a "light-mode vs dark-mode" website split. One cohesive theatrical look.
+3. **Lots of animations / effects / particles** — it should feel like a TV broadcast, not a web app.
+4. **A small Back button**.
+5. **Good sound effects**.
+
+### Files touched
+
+| File | Action |
+|---|---|
+| `index.html` | Replaced. Same step-machine architecture and crossword logic; new theme, new animations, new control bar (back + next + sound), new Web-Audio SFX engine, marquee bulbs, ambient dust layer. |
+| `README.md`  | Rewritten to describe the Studio Edition (palette, sound effects, controls, tech details). |
+| `REPORT.md`  | This entry appended on top. |
+
+### What's new in this iteration
+
+#### Theatrical jewel-tone palette
+Backdrop is a vertical gradient of deep teal-navy `#07182b → #0e2a47`, with the outer letterbox using a subtler `#02060d` and ambient radial halos in gold / purple / ruby that drift slowly with a `bgDrift` keyframe. The stage is bordered by a thin gold hairline, has `box-shadow: 0 0 80px black, inset 0 0 120px rgba(0,0,0,.35)`, so it visually reads as a lit rectangle floating in a dark studio. Cards (crossword, hint, guest, winner-final-scores, video frame, segue) are ivory `#fdf7e6 → #f6ecd3` gradients with gold trim and gold-tinged shadows so they pop against the dark stage but still feel warm. Accents: gold `#e6b34a / #f5d77f`, coral `#ee5b3c`, ruby `#a02e3a`, mint `#3ab59f`. No white-page surfaces; no dark-mode website feel — one stage, one palette.
+
+#### Animated stage backdrop
+- **Sweeping spotlight beams** built from three layered conic-gradients (centre, left, right) painted on `.stage::before`, blended in `mix-blend-mode: screen`, drifting with a `beamSweep` 14 s alternate animation so the lights "swing" across the stage.
+- **Subtle scanlines + dot grain** on `.stage::after` for broadcast texture.
+- **`bgDrift`** halo on the outer wrap so even the surround moves slightly.
+- **Pre-show pool**: a radial spotlight pool centred on the title, pulsing with a `pulseSlow` 4 s alternate.
+
+#### Marquee bulbs around the stage edge
+Pure-CSS gold bulbs on all four edges (~32 along top + bottom, ~18 along each side, total ~100 bulbs). Each bulb has a glowing radial box-shadow and a `bulbBlink` 1.4 s animation; randomised animation-delays so they blink out-of-phase, like a real game-show frame.
+
+#### Ambient dust motes
+A persistent particle layer (`.ambient`) above the backdrop. Every 280 ms a small glowing speck spawns at the bottom edge and drifts upward across 10–22 seconds with a small horizontal drift, then self-removes. Palette is gold / ivory / mint / coral with matching `box-shadow` glows. Renders at low cost.
+
+#### Animated text & cards
+- **Gradient + drop-shadow titles**: show title, intro headline, reveal word, segue logo, winner team name all use a gold-to-amber `linear-gradient` clipped to text with `drop-shadow` glow filters. Show title pulses (`titleShimmer`).
+- **Begin Broadcast / Continue buttons**: gold gradient with a rotating diagonal sheen (`sheen` keyframe), pulsing shadow (`btnPulse`), hover-lift + brightness boost.
+- **Crossword card**: a slow diagonal light-sweep (`cardSweep`) passes across every ~6 s.
+- **Filled crossword cells**: now an animated gold gradient on `cellFlip`.
+- **Highlighted cells**: stronger gold glow, animated background pulse.
+- **Hint header**: navy gradient with a light tail + glowing gold accent bar; hint text fades up after the card lands.
+- **Reveal halo**: a radial gold glow pulses behind the answer word, plus 60 sparkles + 70 confetti pieces.
+- **Winner card**: gradient team-name text per team (blue ramp for A, coral ramp for B, gold ramp for tie); 100-piece confetti burst + 4-piece-per-tick continuous trickle.
+- **Scoreboard**: slides in from above with `chyronSlide`. Score-bump now also shakes (rotation), pops bigger (1.45×), and applies a colour-glow halo for the team that just scored.
+- **Guest photo**: gold ring breathes with a slow `photoSpin`-named glow keyframe.
+
+#### Back button + score-history undo
+A new `◂ Back` button is placed before the step indicator. Triggered by Backspace and Left-arrow as well. `goBack()` decrements `state.step`, and if the previous reveal awarded a point the score is undone using a new `state.scoreHistory` stack (each `awardPoint()` pushes its team onto the stack). The Back button auto-hides on the very first step, on the winner card, and on the segue. It plays a soft "back" two-tone chirp.
+
+#### Web Audio API sound engine
+No more silent mp3 placeholders for SFX. The script defines `ensureAudioCtx()`, an `osc()` helper (oscillator + gain envelope, with optional pitch glide), and a `noise()` helper (white-noise buffer + bandpass + envelope). The `sfx` object exposes named cues: `click`, `back`, `tick`, `beep`, `go`, `shimmer`, `swoosh`, `whoosh`, `reveal` (4-note chord + bell tail + cymbal), `fanfare`, `point(team)` (pitch differs by team), `victory` (6-note grand fanfare + applause-like noise burst). All cues are wired into the step machine, the countdown, the reveal cell-fill (one tick per letter as it lands), button clicks, and the back action. The audio context is unlocked on the first user gesture (Begin Broadcast click) per modern browser autoplay policy.
+
+A round **♪ / ✕ sound-toggle pill** in the top-right of the stage mutes everything (also the optional theme song) — keyboard shortcut **M**. State is in `state.soundOn`.
+
+#### Hover ticks
+The big buttons (Next, Back, Continue, Start, +1A, +1B, Back-to-Board) play a soft `tick` on `mouseenter` for tactile feel.
+
+#### Responsive behaviour
+The `transform: scale(min(w/1920, h/1080))` math is unchanged — it already letterboxes correctly on any aspect ratio. The new dark theatrical surround now fills the letterbox gutters cleanly on widescreen monitors / 4K screens / classroom projectors, instead of leaving a flat black bar. Confirmed by inspection: controls are anchored relative to the 1920×1080 stage, so they always remain inside the visible area regardless of window size.
+
+#### Other
+- Step count unchanged: 25 steps.
+- All previous customization placeholders preserved: WORDS array, theme-song slot, `up-next-title`, player names, team labels, guest `initial`.
+- Inline ASCII grid diagram preserved in the WORDS comment.
+- `Array.from()` is still used so `JOYERÍA`'s `Í` is one grapheme, not two.
+
+### Things deliberately not done
+- The four words still cannot be swapped without re-deriving grid coordinates. (Same constraint as before; auto-layout for arbitrary intersecting word sets is a much bigger feature.)
+- No `localStorage` for restart-resilience — refresh still resets state. Restart Show pill + hard reload remain the two restart paths.
+- Theme song slot retained but no actual mp3 bundled. (All other SFX are synthesized; the theme song is optional.)
+
+### How it was tested
+Static-built only (no dev server). Verified by tracing the step machine through all 25 states and checking:
+- Back button hides on step 0, on winner, on segue.
+- Going back from a transition / feature step into a reveal correctly undoes the most recent score.
+- Audio: Web Audio API context unlocks on first click (Begin Broadcast) and subsequent SFX play. Mute toggle silences both SFX and the theme-song element.
+- Marquee bulbs and ambient dust render and animate without CSS overflow leaking outside the stage box.
+- Cell-fill ticks fire one-per-letter at 75 ms intervals during reveal.
+- Crossword intersections still render as a single DOM cell (gridMap dedup unchanged).
+- Stage scaling math unchanged: `min(w/1920, h/1080)`.
+
+The user should open `index.html` in a browser to confirm the look before showtime.
+
+---
+
 ## 2026-05-06 (later still) — Broadcast Edition: bright editorial theme + true intersecting crossword + Coming Up Next segue
 
 ### Goal
