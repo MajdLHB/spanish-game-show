@@ -72,17 +72,25 @@ button, input { font-family: inherit; }
 ============================================================ */
 .stage-wrap {
   position: fixed; inset: 0;
-  display: grid; place-items: center;
   background:
     radial-gradient(ellipse 80% 60% at 20% 0%, rgba(0, 229, 255, .12), transparent 55%),
     radial-gradient(ellipse 80% 60% at 80% 100%, rgba(255, 61, 131, .12), transparent 55%),
     linear-gradient(180deg, #02030a 0%, #04060f 50%, #02030a 100%);
-  overflow: hidden;
+  overflow: auto; /* fail-safe scroll if scaled stage ever exceeds viewport */
+}
+.stage-fit {
+  /* Holds the scaled stage in normal flow; size is set via JS to match the
+     post-scale visual so layout box == what's drawn (scrollable if larger).
+     We avoid 100vw/100vh defaults because 100vw includes the scrollbar
+     gutter on Windows, which can cause a feedback loop (scrollbar →
+     content > viewport → scrollbar stays). JS sets the size on first run. */
+  position: relative;
+  width: 0; height: 0;
 }
 .stage {
-  position: relative;
+  position: absolute; top: 0; left: 0;
   width: 1920px; height: 1080px;
-  transform-origin: center center;
+  transform-origin: top left;
   background:
     radial-gradient(ellipse 90% 60% at 18% 8%,  rgba(0, 229, 255, .14), transparent 55%),
     radial-gradient(ellipse 90% 60% at 82% 92%, rgba(255, 61, 131, .14), transparent 55%),
@@ -2437,6 +2445,7 @@ button, input { font-family: inherit; }
 <body>
 
 <div class="stage-wrap">
+  <div class="stage-fit" id="stage-fit">
   <div class="stage" id="stage">
 
     <!-- backdrop layers -->
@@ -2817,6 +2826,7 @@ button, input { font-family: inherit; }
     </div>
 
   </div>
+  </div>
 </div>
 
 <script>
@@ -2873,15 +2883,40 @@ const GRID_COLS = 13;
    ===================================================================== */
 function scaleStage() {
   const stage = document.getElementById("stage");
-  const sx = window.innerWidth  / 1920;
-  const sy = window.innerHeight / 1080;
+  const fit   = document.getElementById("stage-fit");
+  // Use the layout viewport (excludes scrollbar gutter) so we don't trigger
+  // a scrollbar-feedback loop after fonts/images cause a late layout shift.
+  const vw = document.documentElement.clientWidth  || window.innerWidth;
+  const vh = document.documentElement.clientHeight || window.innerHeight;
+  const sx = vw / 1920;
+  const sy = vh / 1080;
   // Non-uniform stretch — stage fills the viewport exactly, no letterbox, no cropping.
   // Mild aspect-ratio distortion on non-16:9 displays is intentional (user prefers fill > pillarbox).
+  stage.style.transformOrigin = "top left";
   stage.style.transform = `scale(${sx}, ${sy})`;
+  // Make the fitter's layout box match the post-scale visual size so the scaled
+  // stage is fully reachable (and the wrap can fail-safe scroll if anything exceeds the viewport).
+  fit.style.width  = `${vw}px`;
+  fit.style.height = `${vh}px`;
 }
 window.addEventListener("resize", scaleStage);
 window.addEventListener("orientationchange", scaleStage);
-window.addEventListener("load", scaleStage);
+window.addEventListener("load", () => {
+  scaleStage();
+  // Re-apply on the next two frames in case fonts/images caused a late
+  // layout shift right after load (this is what makes the page look
+  // "fullscreen for a moment then cut" on some refreshes).
+  requestAnimationFrame(scaleStage);
+  requestAnimationFrame(() => requestAnimationFrame(scaleStage));
+});
+// Catch any subsequent layout shifts (font swap, late image load, devtools open, etc.)
+if (typeof ResizeObserver !== "undefined") {
+  new ResizeObserver(scaleStage).observe(document.documentElement);
+}
+// Fonts API: re-fit once webfonts have actually loaded (their metrics may differ).
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(scaleStage);
+}
 scaleStage();
 
 /* =====================================================================
