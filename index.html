@@ -1659,25 +1659,6 @@ button, input { font-family: inherit; }
     radial-gradient(ellipse at center, rgba(255, 61, 131, .15), transparent 75%),
     rgba(7, 11, 26, .97);
 }
-.tn-mark {
-  display: flex; align-items: center; gap: 30px;
-  font-family: var(--display);
-  font-size: 1.3rem; font-weight: 600;
-  letter-spacing: .9em;
-  color: var(--cyan);
-  text-shadow: 0 0 24px var(--cyan-soft);
-  text-transform: uppercase;
-  animation: tnMarkIn .6s cubic-bezier(.2,.8,.3,1.2) both;
-}
-.team-name.team-b .tn-mark { color: var(--magenta); text-shadow: 0 0 24px var(--magenta-soft); }
-.tn-mark::before, .tn-mark::after {
-  content: ""; width: 160px; height: 2px;
-  background: linear-gradient(90deg, transparent, currentColor, transparent);
-}
-@keyframes tnMarkIn {
-  from { opacity: 0; transform: translateY(-22px); letter-spacing: 1.4em; }
-  to   { opacity: 1; transform: translateY(0); letter-spacing: .9em; }
-}
 .tn-name {
   font-family: var(--display);
   font-size: 13rem; font-weight: 700;
@@ -1742,15 +1723,6 @@ button, input { font-family: inherit; }
   55%  { opacity: 1; }
   100% { transform: scale(1) translateY(0);       opacity: 1; filter: blur(0); }
 }
-.tm-mark {
-  font-family: var(--display);
-  font-size: 1rem; font-weight: 600;
-  letter-spacing: .7em;
-  color: var(--cyan);
-  text-shadow: 0 0 18px var(--cyan-soft);
-  text-transform: uppercase;
-}
-.team-member.team-b .tm-mark { color: var(--magenta); text-shadow: 0 0 18px var(--magenta-soft); }
 .tm-name {
   font-family: var(--display);
   font-size: 5.5rem; font-weight: 700;
@@ -1777,16 +1749,16 @@ button, input { font-family: inherit; }
   to   { opacity: 1; transform: translateY(0); }
 }
 .tm-card {
-  width: 340px;
-  padding: 46px 32px 36px;
+  width: 360px;
+  padding: 50px 32px 38px;
   background: linear-gradient(180deg, rgba(26, 34, 64, .55), rgba(14, 20, 40, .55));
   border: 1.5px solid rgba(255, 255, 255, .08);
-  border-radius: 24px;
-  display: flex; flex-direction: column; align-items: center; gap: 22px;
+  border-radius: 22px;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
   transition: transform .6s cubic-bezier(.2,.8,.3,1.4),
               border-color .4s, background .4s, box-shadow .4s, filter .4s, opacity .4s;
   filter: grayscale(.65) brightness(.6);
-  opacity: .7;
+  opacity: .75;
   position: relative;
   overflow: hidden;
 }
@@ -1823,40 +1795,9 @@ button, input { font-family: inherit; }
   55%  { transform: translateY(-18px) scale(1.09); }
   100% { transform: translateY(-14px) scale(1.06); }
 }
-.tm-avatar {
-  font-family: var(--display);
-  font-size: 7rem; font-weight: 700;
-  width: 200px; height: 200px;
-  border-radius: 50%;
-  display: grid; place-items: center;
-  background: linear-gradient(135deg, var(--cyan) 0%, #ffffff 60%, var(--cyan-2) 100%);
-  color: var(--bg-deep);
-  box-shadow:
-    0 0 30px var(--cyan-soft),
-    inset 0 4px 0 rgba(255, 255, 255, .55),
-    inset 0 -14px 28px rgba(0, 0, 0, .25);
-  line-height: 1;
-}
-.team-member.team-b .tm-avatar {
-  background: linear-gradient(135deg, var(--magenta) 0%, #ffffff 60%, var(--magenta-2) 100%);
-  box-shadow:
-    0 0 30px var(--magenta-soft),
-    inset 0 4px 0 rgba(255, 255, 255, .55),
-    inset 0 -14px 28px rgba(0, 0, 0, .25);
-}
-.tm-card.highlighted .tm-avatar { animation: tmAvatarPulse 2s ease-in-out infinite alternate; }
-@keyframes tmAvatarPulse {
-  from { box-shadow: 0 0 30px var(--cyan-soft), inset 0 4px 0 rgba(255, 255, 255, .55), inset 0 -14px 28px rgba(0, 0, 0, .25); }
-  to   { box-shadow: 0 0 60px var(--cyan), 0 0 80px var(--cyan-soft), inset 0 4px 0 rgba(255, 255, 255, .55), inset 0 -14px 28px rgba(0, 0, 0, .25); }
-}
-.team-member.team-b .tm-card.highlighted .tm-avatar { animation-name: tmAvatarPulseB; }
-@keyframes tmAvatarPulseB {
-  from { box-shadow: 0 0 30px var(--magenta-soft), inset 0 4px 0 rgba(255, 255, 255, .55), inset 0 -14px 28px rgba(0, 0, 0, .25); }
-  to   { box-shadow: 0 0 60px var(--magenta), 0 0 80px var(--magenta-soft), inset 0 4px 0 rgba(255, 255, 255, .55), inset 0 -14px 28px rgba(0, 0, 0, .25); }
-}
 .tm-card-name {
   font-family: var(--display);
-  font-size: 2.4rem; font-weight: 700;
+  font-size: 3rem; font-weight: 700;
   color: var(--text);
   letter-spacing: -.01em;
   line-height: 1;
@@ -2668,19 +2609,17 @@ button, input { font-family: inherit; }
 
     <!-- big full-screen team name reveal (auto-advances) -->
     <div class="layer team-name" id="team-name">
-      <div class="tn-mark"  id="tn-mark">★ Equipo A ★</div>
-      <div class="tn-name"  id="tn-name">AOUADI</div>
+      <div class="tn-name"  id="tn-name">EQUIPO A</div>
       <div class="tn-rule"></div>
     </div>
 
     <!-- small team header + member roster, one player highlighted at a time -->
     <div class="layer team-member" id="team-member">
       <div class="tm-header">
-        <span class="tm-mark" id="tm-mark">★ Equipo A ★</span>
-        <span class="tm-name" id="tm-name">AOUADI</span>
+        <span class="tm-name" id="tm-name">EQUIPO A</span>
       </div>
       <div class="tm-roster" id="tm-roster"><!-- filled by JS --></div>
-      <div class="tm-hint" id="tm-hint">Pulsa <span class="kbd-tip">Espacio</span> para continuar</div>
+      <div class="tm-hint">Pulsa <span class="kbd-tip">Espacio</span> para continuar</div>
     </div>
 
     <!-- celebratory full-crossword view after all words revealed -->
@@ -2936,9 +2875,9 @@ function scaleStage() {
   const stage = document.getElementById("stage");
   const sx = window.innerWidth  / 1920;
   const sy = window.innerHeight / 1080;
-  // 0.94 safety margin keeps a healthy gutter on every viewport so the floating controls,
-  // sound toggle, and corner team widgets are never clipped — even on borderline aspect ratios.
-  stage.style.transform = `scale(${Math.min(sx, sy) * 0.94})`;
+  // Non-uniform stretch — stage fills the viewport exactly, no letterbox, no cropping.
+  // Mild aspect-ratio distortion on non-16:9 displays is intentional (user prefers fill > pillarbox).
+  stage.style.transform = `scale(${sx}, ${sy})`;
 }
 window.addEventListener("resize", scaleStage);
 window.addEventListener("orientationchange", scaleStage);
@@ -3089,10 +3028,8 @@ const els = {
   introLogo:      document.getElementById("intro-logo"),
   introReplay:    document.getElementById("intro-replay"),
   teamName:       document.getElementById("team-name"),
-  tnMark:         document.getElementById("tn-mark"),
   tnName:         document.getElementById("tn-name"),
   teamMember:     document.getElementById("team-member"),
-  tmMark:         document.getElementById("tm-mark"),
   tmName:         document.getElementById("tm-name"),
   tmRoster:       document.getElementById("tm-roster"),
   crosswordComplete: document.getElementById("crossword-complete"),
@@ -3227,8 +3164,7 @@ function applyStep() {
       hideBoardChrome();
       els.teamName.classList.add("active");
       els.teamName.classList.toggle("team-b", step.team === "b");
-      els.tnMark.textContent = step.team === "a" ? "★ Equipo A ★" : "★ Equipo B ★";
-      els.tnName.textContent = getTeamName(step.team).toUpperCase();
+      els.tnName.textContent = step.team === "a" ? "EQUIPO A" : "EQUIPO B";
       els.nextBtn.classList.add("hidden");
       els.teamName.querySelectorAll(".confetto, .streak").forEach(el => el.remove());
       spawnConfetti(els.teamName, 90, step.team === "a" ? "cyan" : "magenta");
@@ -3243,12 +3179,10 @@ function applyStep() {
       hideBoardChrome();
       els.teamMember.classList.add("active");
       els.teamMember.classList.toggle("team-b", step.team === "b");
-      els.tmMark.textContent = step.team === "a" ? "★ Equipo A ★" : "★ Equipo B ★";
-      els.tmName.textContent = getTeamName(step.team).toUpperCase();
+      els.tmName.textContent = step.team === "a" ? "EQUIPO A" : "EQUIPO B";
       const players = getPlayerNames(step.team);
       els.tmRoster.innerHTML = players.map((p, i) => `
         <div class="tm-card ${i === step.idx ? "highlighted" : ""}">
-          <div class="tm-avatar">${p.charAt(0).toUpperCase()}</div>
           <div class="tm-card-name">${p}</div>
           <div class="tm-card-tag">Jugador</div>
         </div>
