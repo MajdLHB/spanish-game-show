@@ -1439,7 +1439,10 @@ button, input { font-family: inherit; }
   overflow: hidden;
   background: #000;
 }
-.video-frame-inner iframe { width: 100%; height: 100%; border: 0; display: block; }
+.video-frame-inner iframe,
+.video-frame-inner video { width: 100%; height: 100%; border: 0; display: none; background: #000; object-fit: contain; }
+.video-frame-inner iframe.active,
+.video-frame-inner video.active { display: block; }
 
 /* video header row — feature tag on the left + small show-logo bug on the right */
 .fv-header {
@@ -2698,6 +2701,7 @@ button, input { font-family: inherit; }
         <div class="video-frame" id="video-frame">
           <div class="video-frame-inner">
             <iframe id="video-iframe" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <video  id="video-file"  preload="auto" playsinline controls></video>
           </div>
         </div>
       </div>
@@ -2855,7 +2859,7 @@ const WORDS = [
     direction: "horizontal",
     startRow: 7, startCol: 0,
     hint:    { kind: "emojis", value: ["💍", "💎", "⌚"] },
-    feature: { kind: "video", url: "https://youtube.com/shorts/B8Vtv2hFQOU" }
+    feature: { kind: "video", url: "joyeria.mp4" }
   },
   {
     id: 3,
@@ -3092,6 +3096,7 @@ const els = {
   featureGuest:   document.getElementById("feature-guest"),
   videoFrame:     document.getElementById("video-frame"),
   videoIframe:    document.getElementById("video-iframe"),
+  videoFile:      document.getElementById("video-file"),
   guestName:      document.getElementById("guest-name"),
   guestTitle:     document.getElementById("guest-title"),
   guestWord:      document.getElementById("guest-word"),
@@ -3541,16 +3546,64 @@ function toEmbedUrl(raw) {
   } catch (_) {}
   return url; // assume embed-friendly URL
 }
+function isLocalVideo(url) {
+  // Anything that isn't an http(s) URL is treated as a same-origin file path
+  return !!url && !/^https?:\/\//i.test(url);
+}
 function playVideo(rawUrl) {
-  const url = toEmbedUrl(rawUrl);
-  if (!url) { stopVideo(); return; }
-  const sep = url.includes("?") ? "&" : "?";
-  els.videoIframe.src = url + sep + "autoplay=1&rel=0";
+  const raw = (rawUrl || "").trim();
+  if (!raw) { stopVideo(); return; }
+  if (isLocalVideo(raw)) {
+    // local file → use <video> element
+    if (els.videoIframe) {
+      els.videoIframe.classList.remove("active");
+      if (els.videoIframe.src) els.videoIframe.src = "";
+    }
+    if (els.videoFile) {
+      els.videoFile.classList.add("active");
+      if (els.videoFile.getAttribute("src") !== raw) els.videoFile.src = raw;
+      try { els.videoFile.currentTime = 0; } catch (_) {}
+      const p = els.videoFile.play();
+      if (p && p.catch) p.catch(() => {});
+    }
+  } else {
+    // remote URL → use YouTube/embed iframe
+    const url = toEmbedUrl(raw);
+    if (!url) { stopVideo(); return; }
+    if (els.videoFile) {
+      try { els.videoFile.pause(); } catch (_) {}
+      els.videoFile.removeAttribute("src");
+      try { els.videoFile.load(); } catch (_) {}
+      els.videoFile.classList.remove("active");
+    }
+    if (els.videoIframe) {
+      els.videoIframe.classList.add("active");
+      const sep = url.includes("?") ? "&" : "?";
+      els.videoIframe.src = url + sep + "autoplay=1&rel=0";
+    }
+  }
 }
 function stopVideo() {
-  // setting src="" stops the audio immediately on every browser
+  // setting src="" stops the audio/video immediately on every browser
   if (els.videoIframe && els.videoIframe.src) els.videoIframe.src = "";
+  if (els.videoFile) {
+    try { els.videoFile.pause(); } catch (_) {}
+    els.videoFile.removeAttribute("src");
+    try { els.videoFile.load(); } catch (_) {}
+  }
 }
+// Pre-warm the browser cache for local feature videos at page load so they
+// play instantly even on bad WiFi (the joyería step doesn't open until later
+// in the show, by which time the file is already cached).
+(function prewarmLocalVideos() {
+  try {
+    WORDS.forEach(w => {
+      if (w && w.feature && w.feature.kind === "video" && isLocalVideo(w.feature.url)) {
+        fetch(w.feature.url).catch(() => {});
+      }
+    });
+  } catch (_) {}
+})();
 
 /* =====================================================================
    7. PARTICLES — confetti, sparkles, streaks, ambient dust, orbs
