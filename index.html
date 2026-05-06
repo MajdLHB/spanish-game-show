@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EL GRAN SHOW — 2026</title>
+<title>RINCONES DEL MUNDO — 2026</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
 
@@ -211,9 +211,9 @@ button, input { font-family: inherit; }
 .preshow {
   flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 50px;
+  gap: 36px;
   z-index: 30;
-  padding: 80px;
+  padding: 60px;
 }
 .preshow::before {
   content: ""; position: absolute; inset: 0;
@@ -273,7 +273,7 @@ button, input { font-family: inherit; }
 
 .show-title {
   font-family: var(--display);
-  font-size: 14rem; font-weight: 700;
+  font-size: 8rem; font-weight: 700;
   line-height: .88;
   letter-spacing: -.04em;
   color: var(--text);
@@ -285,6 +285,7 @@ button, input { font-family: inherit; }
   filter: drop-shadow(0 8px 30px rgba(0, 229, 255, .4))
           drop-shadow(0 8px 30px rgba(255, 61, 131, .35));
   animation: titleBreathe 4s ease-in-out infinite alternate;
+  text-transform: uppercase;
 }
 @keyframes titleBreathe {
   from { filter: drop-shadow(0 8px 30px rgba(0, 229, 255, .3))
@@ -419,7 +420,7 @@ button, input { font-family: inherit; }
 }
 .intro-headline {
   font-family: var(--display);
-  font-size: 14rem; font-weight: 700;
+  font-size: 8rem; font-weight: 700;
   line-height: .9;
   letter-spacing: -.04em;
   color: var(--text);
@@ -429,6 +430,7 @@ button, input { font-family: inherit; }
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 12px 38px rgba(0, 229, 255, .45))
           drop-shadow(0 12px 38px rgba(255, 61, 131, .35));
+  text-transform: uppercase;
 }
 .intro-logo .intro-headline {
   animation: introZoom 2.4s cubic-bezier(.2,.8,.3,1.2) both;
@@ -440,7 +442,7 @@ button, input { font-family: inherit; }
 }
 .intro-replay .intro-headline {
   animation: replayZoom 1.6s cubic-bezier(.2,.8,.3,1.2) both;
-  font-size: 11rem;
+  font-size: 6.5rem;
 }
 @keyframes replayZoom {
   0%   { transform: scale(0.7); opacity: 0; filter: blur(18px); }
@@ -461,154 +463,252 @@ button, input { font-family: inherit; }
 }
 
 /* ============================================================
-   7. SCOREBOARD
+   6.5  WORLD LOGO — corner brackets pulsing around a rotating globe
+============================================================ */
+.world-logo {
+  --size: 320px;
+  --globe: calc(var(--size) * 0.62);
+  --bracket: calc(var(--size) * 0.22);
+  --bw: 3px;
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  filter: drop-shadow(0 0 60px rgba(0, 229, 255, .25))
+          drop-shadow(0 0 60px rgba(255, 61, 131, .2));
+}
+.world-logo.md { --size: 260px; }
+.world-logo.sm { --size: 210px; }
+
+.wl-bracket {
+  position: absolute;
+  width: var(--bracket); height: var(--bracket);
+  pointer-events: none;
+  animation: wlBracket 2.6s ease-in-out infinite alternate;
+}
+.wl-bracket::before, .wl-bracket::after {
+  content: ""; position: absolute;
+  background: var(--cyan);
+  box-shadow: 0 0 14px var(--cyan-soft), 0 0 22px var(--cyan-soft);
+  border-radius: 1px;
+}
+.wl-bracket::before { width: 100%; height: var(--bw); }
+.wl-bracket::after  { width: var(--bw); height: 100%; }
+
+.wl-bracket.tl { top: 0; left: 0; --bx: -10px; --by: -10px; }
+.wl-bracket.tl::before { top: 0;    left: 0; }
+.wl-bracket.tl::after  { top: 0;    left: 0; }
+
+.wl-bracket.tr { top: 0; right: 0; --bx:  10px; --by: -10px; animation-delay: .15s; }
+.wl-bracket.tr::before { top: 0;    right: 0; }
+.wl-bracket.tr::after  { top: 0;    right: 0; }
+
+.wl-bracket.bl { bottom: 0; left: 0; --bx: -10px; --by:  10px; animation-delay: .3s; }
+.wl-bracket.bl::before { bottom: 0; left: 0; }
+.wl-bracket.bl::after  { bottom: 0; left: 0; }
+
+.wl-bracket.br { bottom: 0; right: 0; --bx:  10px; --by:  10px; animation-delay: .45s; }
+.wl-bracket.br::before { bottom: 0; right: 0; }
+.wl-bracket.br::after  { bottom: 0; right: 0; }
+
+/* alternating colors — diagonals share a hue */
+.wl-bracket.tr::before, .wl-bracket.tr::after,
+.wl-bracket.bl::before, .wl-bracket.bl::after {
+  background: var(--magenta);
+  box-shadow: 0 0 14px var(--magenta-soft), 0 0 22px var(--magenta-soft);
+}
+
+@keyframes wlBracket {
+  from { transform: translate(0, 0); opacity: .82; }
+  to   { transform: translate(var(--bx, 0), var(--by, 0)); opacity: 1; }
+}
+
+.wl-globe {
+  position: relative;
+  width: var(--globe); height: var(--globe);
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow:
+    0 0 50px var(--cyan-soft),
+    0 0 80px var(--magenta-soft),
+    inset 0 -22px 50px rgba(0, 0, 0, .55),
+    inset 0  22px 36px rgba(255, 255, 255, .12);
+  animation: wlGlobeFloat 4s ease-in-out infinite alternate;
+}
+@keyframes wlGlobeFloat {
+  from { transform: translateY(-3px); }
+  to   { transform: translateY(3px); }
+}
+.wl-globe-sphere {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .38), transparent 48%),
+    conic-gradient(from 0deg,
+      var(--cyan)    0%,
+      var(--violet) 28%,
+      var(--magenta) 52%,
+      var(--cyan-2) 78%,
+      var(--cyan)  100%);
+  animation: wlGlobeSpin 14s linear infinite;
+}
+@keyframes wlGlobeSpin { to { transform: rotate(360deg); } }
+
+.wl-globe::before, .wl-globe::after {
+  content: ""; position: absolute;
+  border: 1.5px solid rgba(255, 255, 255, .55);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(255, 255, 255, .35);
+}
+.wl-globe::before {
+  /* equator (horizontal ellipse) */
+  top: 50%; left: 6%; right: 6%; height: 30%;
+  transform: translateY(-50%);
+}
+.wl-globe::after {
+  /* meridian (vertical ellipse) */
+  top: 6%; bottom: 6%; left: 50%; width: 30%;
+  transform: translateX(-50%);
+}
+
+.world-title {
+  font-family: var(--display);
+  font-weight: 700;
+  line-height: .88;
+  letter-spacing: -.04em;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff 0%, #b3e8ff 40%, #ff80b8 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 8px 30px rgba(0, 229, 255, .4))
+          drop-shadow(0 8px 30px rgba(255, 61, 131, .35));
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   7. SCOREBOARD — two floating glass team cards (top corners)
 ============================================================ */
 .scoreboard {
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 156px;
-  padding: 18px 50px 0;
+  position: absolute; inset: 0;
   display: none;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: stretch;
-  gap: 30px;
-  background:
-    linear-gradient(180deg, rgba(14, 20, 40, .92) 0%, rgba(14, 20, 40, .75) 100%);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, .55);
+  pointer-events: none;
   z-index: 10;
-  backdrop-filter: blur(14px);
-  animation: chyronSlide .7s cubic-bezier(.2,.8,.3,1.2) both;
 }
-.scoreboard::after {
-  content: "";
-  position: absolute; left: 0; right: 0; bottom: 0;
+.scoreboard.active { display: block; }
+
+.team-card {
+  position: absolute;
+  top: 24px;
+  width: 420px;
+  height: 130px;
+  background: linear-gradient(180deg, rgba(26, 34, 64, .88) 0%, rgba(14, 20, 40, .88) 100%);
+  border: 1px solid var(--border-strong);
+  border-radius: 18px;
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow), 0 0 40px rgba(0, 0, 0, .55);
+  padding: 18px 24px;
+  display: grid;
+  align-items: center;
+  gap: 18px;
+  pointer-events: auto;
+  animation: cardSlide .7s cubic-bezier(.2,.8,.3,1.2) both;
+  overflow: hidden;
+}
+.team-card::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0;
   height: 2px;
   background: linear-gradient(90deg, var(--cyan), var(--magenta));
-  box-shadow: 0 0 20px var(--cyan), 0 0 30px var(--magenta);
+  box-shadow: 0 0 14px var(--cyan), 0 0 18px var(--magenta);
+  opacity: .65;
 }
-@keyframes chyronSlide {
-  from { transform: translateY(-110%); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-.scoreboard.active { display: grid; }
-
-.team {
-  display: grid;
-  grid-template-columns: 4px 1fr auto;
-  align-items: stretch;
-  gap: 22px;
-  padding: 6px 0 14px;
-}
-.team.b { grid-template-columns: auto 1fr 4px; text-align: right; }
+.team-card.a { left: 24px;  grid-template-columns: 5px 1fr auto; }
+.team-card.b { right: 24px; grid-template-columns: auto 1fr 5px; text-align: right; }
 .team-stripe {
-  background: var(--team-a);
-  box-shadow: 0 0 20px var(--team-a-soft);
-  border-radius: 2px;
+  width: 5px; height: 78%;
+  background: var(--cyan);
+  box-shadow: 0 0 14px var(--cyan-soft);
+  border-radius: 3px;
+  align-self: center;
 }
-.team.b .team-stripe { background: var(--team-b); box-shadow: 0 0 20px var(--team-b-soft); }
+.team-card.b .team-stripe { background: var(--magenta); box-shadow: 0 0 14px var(--magenta-soft); }
 .team-info {
   display: flex; flex-direction: column;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
+  min-width: 0;
 }
+.team-card.b .team-info { align-items: flex-end; }
 .team-tag {
   font-family: var(--display);
-  font-size: .78rem; font-weight: 600;
-  letter-spacing: .55em;
-  color: var(--team-a);
+  font-size: .72rem; font-weight: 600;
+  letter-spacing: .45em;
+  color: var(--cyan);
   text-transform: uppercase;
-  text-shadow: 0 0 12px var(--team-a-soft);
+  text-shadow: 0 0 12px var(--cyan-soft);
 }
-.team.b .team-tag { color: var(--team-b); text-shadow: 0 0 12px var(--team-b-soft); }
+.team-card.b .team-tag { color: var(--magenta); text-shadow: 0 0 12px var(--magenta-soft); }
 .team-label {
   font-family: var(--display);
-  font-size: 2.1rem; font-weight: 700;
+  font-size: 1.65rem; font-weight: 700;
   color: var(--text);
   line-height: 1;
   letter-spacing: -.01em;
+  white-space: nowrap;
 }
 .players {
   font-family: var(--sans);
-  font-size: .85rem; font-weight: 500;
-  letter-spacing: .2em;
+  font-size: .72rem; font-weight: 500;
+  letter-spacing: .22em;
   color: var(--text-mute);
   text-transform: uppercase;
-  display: flex; gap: 6px; flex-wrap: wrap;
+  display: flex; gap: 4px; flex-wrap: wrap;
 }
-.team.b .players { justify-content: flex-end; }
+.team-card.b .players { justify-content: flex-end; }
 .players span:not(:last-child)::after { content: " · "; color: var(--text-mute); }
 
 .team-score {
   font-family: var(--display);
-  font-size: 6rem; font-weight: 700;
+  font-size: 4.4rem; font-weight: 700;
   color: var(--text);
   line-height: 1;
   align-self: center;
   font-variant-numeric: tabular-nums;
-  min-width: 110px; text-align: center;
-  text-shadow: 0 0 24px var(--team-a-soft);
+  min-width: 96px; text-align: center;
+  text-shadow: 0 0 22px var(--cyan-soft);
 }
-.team.b .team-score { text-shadow: 0 0 24px var(--team-b-soft); }
+.team-card.b .team-score { text-shadow: 0 0 22px var(--magenta-soft); }
 .team-score.bump { animation: scoreBump .9s cubic-bezier(.2,.8,.3,1.4); }
 @keyframes scoreBump {
   0%   { transform: scale(1); }
-  30%  { transform: scale(1.55) rotate(-5deg); text-shadow: 0 0 60px var(--team-a), 0 0 120px var(--team-a-soft); color: var(--team-a); }
+  30%  { transform: scale(1.55) rotate(-5deg); text-shadow: 0 0 60px var(--cyan), 0 0 120px var(--cyan-soft); color: var(--cyan); }
   100% { transform: scale(1); }
 }
-.team.b .team-score.bump { animation-name: scoreBumpB; }
+.team-card.b .team-score.bump { animation-name: scoreBumpB; }
 @keyframes scoreBumpB {
   0%   { transform: scale(1); }
-  30%  { transform: scale(1.55) rotate(5deg); text-shadow: 0 0 60px var(--team-b), 0 0 120px var(--team-b-soft); color: var(--team-b); }
+  30%  { transform: scale(1.55) rotate(5deg); text-shadow: 0 0 60px var(--magenta), 0 0 120px var(--magenta-soft); color: var(--magenta); }
   100% { transform: scale(1); }
 }
 .team-score.glow {
   animation: scoreGlow 2s ease-in-out;
 }
 @keyframes scoreGlow {
-  0%   { text-shadow: 0 0 24px var(--team-a-soft); }
-  50%  { text-shadow: 0 0 60px var(--team-a), 0 0 120px var(--team-a-soft); color: var(--team-a); }
-  100% { text-shadow: 0 0 24px var(--team-a-soft); }
+  0%   { text-shadow: 0 0 22px var(--cyan-soft); }
+  50%  { text-shadow: 0 0 60px var(--cyan), 0 0 120px var(--cyan-soft); color: var(--cyan); }
+  100% { text-shadow: 0 0 22px var(--cyan-soft); }
 }
-.team.b .team-score.glow { animation-name: scoreGlowB; }
+.team-card.b .team-score.glow { animation-name: scoreGlowB; }
 @keyframes scoreGlowB {
-  0%   { text-shadow: 0 0 24px var(--team-b-soft); }
-  50%  { text-shadow: 0 0 60px var(--team-b), 0 0 120px var(--team-b-soft); color: var(--team-b); }
-  100% { text-shadow: 0 0 24px var(--team-b-soft); }
+  0%   { text-shadow: 0 0 22px var(--magenta-soft); }
+  50%  { text-shadow: 0 0 60px var(--magenta), 0 0 120px var(--magenta-soft); color: var(--magenta); }
+  100% { text-shadow: 0 0 22px var(--magenta-soft); }
 }
-
-.scoreboard-center {
-  align-self: center;
-  text-align: center;
-  padding: 0 24px;
-}
-.center-mark {
-  display: flex; align-items: center; justify-content: center; gap: 12px;
-  font-family: var(--display);
-  font-size: .72rem; font-weight: 600;
-  letter-spacing: .5em;
-  color: var(--magenta);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  text-shadow: 0 0 14px var(--magenta-soft);
-}
-.center-mark::before, .center-mark::after {
-  content: ""; width: 28px; height: 1.5px;
-  background: linear-gradient(90deg, transparent, var(--magenta), transparent);
-}
-.center-logo {
-  font-family: var(--display);
-  font-size: 2.1rem; font-weight: 700;
-  letter-spacing: -.01em;
-  color: var(--text);
-  line-height: 1;
-}
-.center-tagline {
-  font-family: var(--display);
-  font-size: .68rem; font-weight: 500;
-  letter-spacing: .55em;
-  color: var(--text-mute);
-  margin-top: 6px;
-  text-transform: uppercase;
+@keyframes cardSlide {
+  from { opacity: 0; transform: translateY(-18px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ============================================================
@@ -616,7 +716,7 @@ button, input { font-family: inherit; }
 ============================================================ */
 .board {
   position: absolute;
-  left: 50%; top: 200px;
+  left: 50%; top: 188px;
   transform: translateX(-50%);
   display: none;
   flex-direction: column;
@@ -1169,7 +1269,7 @@ button, input { font-family: inherit; }
 }
 .celeb-team {
   font-family: var(--display);
-  font-size: 13rem; font-weight: 700;
+  font-size: 10rem; font-weight: 700;
   line-height: .95;
   letter-spacing: -.04em;
   text-align: center;
@@ -1514,7 +1614,7 @@ button, input { font-family: inherit; }
 }
 .winner-team-name {
   font-family: var(--display);
-  font-size: 13rem; font-weight: 700;
+  font-size: 10rem; font-weight: 700;
   letter-spacing: -.04em;
   line-height: .95;
   text-align: center;
@@ -1638,7 +1738,7 @@ button, input { font-family: inherit; }
 }
 .segue-logo {
   font-family: var(--display);
-  font-size: 14rem; font-weight: 700;
+  font-size: 8rem; font-weight: 700;
   line-height: .9;
   letter-spacing: -.04em;
   text-align: center;
@@ -1647,6 +1747,7 @@ button, input { font-family: inherit; }
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 12px 38px rgba(0, 229, 255, .45))
           drop-shadow(0 12px 38px rgba(255, 61, 131, .35));
+  text-transform: uppercase;
 }
 .segue-rule {
   width: 320px; height: 3px;
@@ -1768,7 +1869,7 @@ button, input { font-family: inherit; }
 
 .sound-toggle {
   position: absolute;
-  top: 24px; right: 24px;
+  bottom: 28px; left: 28px;
   z-index: 95;
   font-family: var(--display);
   font-size: .65rem; font-weight: 700;
@@ -1814,36 +1915,29 @@ button, input { font-family: inherit; }
     </audio>
 
     <!-- ================================================
-         SCOREBOARD
+         SCOREBOARD — two floating team cards (top corners)
     ================================================ -->
     <div class="scoreboard" id="scoreboard">
-      <div class="team a">
+      <div class="team-card a">
         <div class="team-stripe"></div>
         <div class="team-info">
           <div class="team-tag">Equipo · Team A</div>
-          <div class="team-label">Team A</div>
+          <div class="team-label">Aouadi</div>
           <div class="players">
-            <span>Player 1</span>
-            <span>Player 2</span>
+            <span>Aouadi</span>
           </div>
         </div>
         <div class="team-score" id="score-a">0</div>
       </div>
 
-      <div class="scoreboard-center">
-        <div class="center-mark">★ EN VIVO · LIVE ★</div>
-        <div class="center-logo">EL GRAN SHOW</div>
-        <div class="center-tagline">Spanish Class · Crossword 2026</div>
-      </div>
-
-      <div class="team b">
+      <div class="team-card b">
         <div class="team-score" id="score-b">0</div>
         <div class="team-info">
           <div class="team-tag">Equipo · Team B</div>
-          <div class="team-label">Team B</div>
+          <div class="team-label">Siwar y Ahlem</div>
           <div class="players">
-            <span>Player 3</span>
-            <span>Player 4</span>
+            <span>Siwar</span>
+            <span>Ahlem</span>
           </div>
         </div>
         <div class="team-stripe"></div>
@@ -1875,8 +1969,15 @@ button, input { font-family: inherit; }
     ================================================ -->
     <div class="layer preshow active" id="preshow">
       <div class="live-pill"><span class="live-dot"></span> ON AIR · 2026</div>
-      <div class="preshow-mark"><span>★ EL GRAN SHOW ★</span></div>
-      <h1 class="show-title">EL GRAN<br>SHOW</h1>
+      <div class="preshow-mark"><span>★ RINCONES DEL MUNDO ★</span></div>
+      <div class="world-logo md">
+        <span class="wl-bracket tl"></span>
+        <span class="wl-bracket tr"></span>
+        <span class="wl-bracket bl"></span>
+        <span class="wl-bracket br"></span>
+        <div class="wl-globe"><div class="wl-globe-sphere"></div></div>
+      </div>
+      <h1 class="show-title">RINCONES<br>DEL MUNDO</h1>
       <div class="show-subtitle">Spanish Class · Crossword Edition</div>
       <button class="start-btn" id="start-btn">
         <span class="triangle"></span>
@@ -1896,7 +1997,14 @@ button, input { font-family: inherit; }
     <div class="layer intro-logo" id="intro-logo">
       <div class="intro-frame">
         <div class="intro-rule">Spanish Class Presents</div>
-        <h1 class="intro-headline">EL GRAN<br>SHOW</h1>
+        <div class="world-logo">
+          <span class="wl-bracket tl"></span>
+          <span class="wl-bracket tr"></span>
+          <span class="wl-bracket bl"></span>
+          <span class="wl-bracket br"></span>
+          <div class="wl-globe"><div class="wl-globe-sphere"></div></div>
+        </div>
+        <h1 class="intro-headline">RINCONES<br>DEL MUNDO</h1>
         <div class="intro-rule">A Game of Words · 2026</div>
       </div>
     </div>
@@ -1926,14 +2034,14 @@ button, input { font-family: inherit; }
           <span class="point-btn-num">+1</span>
           <span class="point-btn-text">
             <span class="small">Award point</span>
-            <span class="big">Team A</span>
+            <span class="big">Aouadi</span>
           </span>
         </button>
         <button class="point-btn b" id="point-b">
           <span class="point-btn-num">+1</span>
           <span class="point-btn-text">
             <span class="small">Award point</span>
-            <span class="big">Team B</span>
+            <span class="big">Siwar y Ahlem</span>
           </span>
         </button>
       </div>
@@ -1942,20 +2050,27 @@ button, input { font-family: inherit; }
     <div class="layer celebration" id="celebration">
       <div class="celeb-rule" id="celeb-rule">★ Punto Anotado · Point Scored ★</div>
       <div class="celeb-eyebrow">Equipo · Team</div>
-      <div class="celeb-team" id="celeb-team">Team A</div>
+      <div class="celeb-team" id="celeb-team">Aouadi</div>
       <div class="celeb-score-block">
         <div class="celeb-plus-one">+1 Punto · +1 Point</div>
         <div class="celeb-score" id="celeb-score">1</div>
       </div>
       <div class="celeb-players" id="celeb-players">
-        <span>Player 1</span><span>Player 2</span>
+        <span>Aouadi</span>
       </div>
     </div>
 
     <div class="layer intro-replay" id="intro-replay">
       <div class="intro-frame">
         <div class="intro-rule">Próximo · Coming Up</div>
-        <h1 class="intro-headline">EL GRAN<br>SHOW</h1>
+        <div class="world-logo md">
+          <span class="wl-bracket tl"></span>
+          <span class="wl-bracket tr"></span>
+          <span class="wl-bracket bl"></span>
+          <span class="wl-bracket br"></span>
+          <div class="wl-globe"><div class="wl-globe-sphere"></div></div>
+        </div>
+        <h1 class="intro-headline">RINCONES<br>DEL MUNDO</h1>
         <div class="intro-rule">★ EN VIVO ★</div>
       </div>
     </div>
@@ -2007,17 +2122,17 @@ button, input { font-family: inherit; }
       <div class="winner-tag">Resultado Final · Final Result</div>
       <div class="winner-stack">
         <div class="winner-eyebrow">Ganadores · Winners</div>
-        <div class="winner-team-name team-a" id="winner-team-name">Team A</div>
+        <div class="winner-team-name team-a" id="winner-team-name">Aouadi</div>
         <div class="winner-rule"></div>
       </div>
       <div class="final-scores-card" id="final-scores-card">
         <div class="fs-team">
-          <div class="fs-team-tag a">Team A</div>
+          <div class="fs-team-tag a">Aouadi</div>
           <div class="fs-team-num" id="fs-team-a-num">0</div>
         </div>
         <div class="fs-divider"></div>
         <div class="fs-team">
-          <div class="fs-team-tag b">Team B</div>
+          <div class="fs-team-tag b">Siwar y Ahlem</div>
           <div class="fs-team-num" id="fs-team-b-num">0</div>
         </div>
       </div>
@@ -2029,7 +2144,14 @@ button, input { font-family: inherit; }
 
     <div class="layer segue-overlay" id="segue-overlay">
       <div class="segue-mark">Coming Up Next</div>
-      <div class="segue-logo">EL GRAN<br>SHOW</div>
+      <div class="world-logo sm">
+        <span class="wl-bracket tl"></span>
+        <span class="wl-bracket tr"></span>
+        <span class="wl-bracket bl"></span>
+        <span class="wl-bracket br"></span>
+        <div class="wl-globe"><div class="wl-globe-sphere"></div></div>
+      </div>
+      <div class="segue-logo">RINCONES<br>DEL MUNDO</div>
       <div class="segue-rule"></div>
       <div class="segue-up-next">
         <div class="segue-up-next-label">Más a continuación · Up Next</div>
@@ -2326,8 +2448,11 @@ function tryPlay(audio, vol = 1) {
 
 function getPlayerNames(team) {
   // mirrors the names in the scoreboard markup
-  if (team === "a") return ["Player 1", "Player 2"];
-  return ["Player 3", "Player 4"];
+  if (team === "a") return ["Aouadi"];
+  return ["Siwar", "Ahlem"];
+}
+function getTeamName(team) {
+  return team === "a" ? "Aouadi" : "Siwar y Ahlem";
 }
 
 function applyStep() {
@@ -2434,7 +2559,7 @@ function applyStep() {
       // last awarded team is at top of history stack
       const team = state.scoreHistory[state.scoreHistory.length - 1] || "a";
       if (team === "b") els.celebration.classList.add("team-b-bg");
-      els.celebTeam.textContent  = team === "a" ? "Team A" : "Team B";
+      els.celebTeam.textContent  = getTeamName(team);
       els.celebScore.textContent = state.scores[team];
       els.celebPlayers.innerHTML = getPlayerNames(team)
         .map(n => `<span>${n}</span>`).join("");
@@ -2502,9 +2627,9 @@ function applyStep() {
 
       const a = state.scores.a, b = state.scores.b;
       let teamName, teamClass;
-      if (a > b)      { teamName = "Team A";  teamClass = "team-a"; }
-      else if (b > a) { teamName = "Team B";  teamClass = "team-b"; }
-      else            { teamName = "Empate · Tie"; teamClass = "tie"; }
+      if (a > b)      { teamName = getTeamName("a"); teamClass = "team-a"; }
+      else if (b > a) { teamName = getTeamName("b"); teamClass = "team-b"; }
+      else            { teamName = "Empate · Tie";   teamClass = "tie"; }
       els.winnerTeamName.textContent = teamName;
       els.winnerTeamName.className = "winner-team-name " + teamClass;
       els.fsTeamA.textContent = a;
