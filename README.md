@@ -1,77 +1,89 @@
-# RINCONES DEL MUNDO — 2026 Edition
+# RINCONES DEL MUNDO — 2026
 
-A single-file, **broadcast-grade** TV game show for a Spanish class. The stage is built like a 2026 evening-broadcast set: a deep navy void washed by cyan + magenta aurora gradients, drifting purple orbs, a faint 2-pixel grid, animated film-grain, glass overlays with neon trim, giant Space Grotesk display type, and an **animated "corners-of-the-world" logo** — four pulsing L-shaped corner brackets framing a rotating globe (cyan / violet / magenta gradient sphere with equator and meridian rings).
+A single-file, **broadcast-grade** TV game show for a Spanish A1 / A2 class. The stage is built like a 2026 evening-broadcast set: deep navy void washed by cyan + magenta aurora gradients, drifting purple orbs, faint 64-px grid, animated film-grain, glass overlays with neon trim, giant Space Grotesk display type, and an **animated "corners-of-the-world" logo** — four pulsing L-shaped corner brackets framing a rotating globe (cyan / violet / magenta gradient sphere with equator and meridian rings).
 
 Two student teams compete to guess **four physically-intersecting Spanish words** on a real crossword grid (`SUPERMERCADO`, `JOYERÍA`, `PROFESORA`, `INGENIERO`):
 
-- **Team A — Aouadi** (1 player)
-- **Team B — Siwar y Ahlem** (2 players)
+- **Equipo A — Aouadi** (1 player)
+- **Equipo B — Siwar y Ahlem** (2 players)
 
-The host advances through a 29-step broadcast with the floating **Next ▸** pill or the **Spacebar**, and can step backward with the **◂ Back** pill or **Left-arrow / Backspace**. **All sound effects are synthesized in the browser via the Web Audio API** — no audio files needed; everything works the moment you open `index.html`.
+The host advances through a **37-step broadcast** with the floating **Siguiente ▸** pill or the **Espacio** key, and can step backward with the **◂ Atrás** pill or **Left-arrow / Backspace**. **All sound effects are synthesized in the browser via the Web Audio API** — open `index.html` and the show works offline. Every visible word is in Spanish (A1 / A2 friendly); there are no English subtitles in the on-air UI.
 
 ---
 
 ## What's on screen
 
-- **Animated "Rincones del Mundo" logo** — four L-shaped corner brackets (alternating cyan / magenta) pulsing outward on a 2.6 s cycle, framing a rotating globe with conic-gradient sphere, equator ellipse, and meridian ellipse. Used in pre-show, intro, intro-replay, and the closing segue at three sizes (`.world-logo.md`, default, `.world-logo.sm`).
-- **Two floating glass team widgets** in the top corners — Team A (cyan) anchored top-left, Team B (magenta) anchored top-right. Each ~420 × 130, with a colour stripe accent, eyebrow tag (`EQUIPO · TEAM A/B`), team name in display type (`Aouadi`, `Siwar y Ahlem`), player names, and a giant tabular score number. Replaces the old top chyron header bar so the crossword has more breathing room.
-- **2026 dark broadcast palette** — `#070b1a` base, cyan `#00e5ff`, magenta `#ff3d83`, violet `#8b5cf6`, ivory `#f5f7fc`, soft amber + lime for special accents. Team A is cyan, Team B is magenta. No light/dark mode split — one cohesive set palette.
-- **Modern type** — `Space Grotesk` for everything display (titles, scores, headlines, banners) and `Inter` for body / small UI. Both loaded from Google Fonts with safe fallbacks.
-- **Animated stage backdrop** — multi-axis aurora made of three blurred radial gradients drifting slowly (`auroraDrift`), a soft 64-px grid masked to a centre vignette, animated grain, and **five blurred drifting orbs** (cyan / magenta / violet) that float around the entire show as ambient atmosphere.
+- **Animated "Rincones del Mundo" logo** — four L-shaped corner brackets (alternating cyan / magenta) pulsing outward on a 2.6 s cycle around a rotating globe with conic-gradient sphere, equator ellipse, and meridian ellipse. Used in pre-show, the opening logo splash, intro replay, the closing trip bumper, and the final logo loop. Three sizes (`.world-logo` / `.md` / `.sm`) via a single `--size` custom property.
+- **Two floating glass team widgets** in the top corners — Aouadi (cyan) anchored top-left, Siwar y Ahlem (magenta) anchored top-right. Each ~420 × 130, with a colour stripe accent, eyebrow tag (`EQUIPO A` / `EQUIPO B`), team name in display type, player names, and a giant tabular score number. Replaces the old top chyron header bar so the crossword has more breathing room.
+- **2026 dark broadcast palette** — `#070b1a` base, cyan `#00e5ff`, magenta `#ff3d83`, violet `#8b5cf6`, ivory `#f5f7fc`. Equipo A is cyan, Equipo B is magenta.
+- **Modern type** — `Space Grotesk` for everything display (titles, scores, headlines, banners, badges) and `Inter` for body / small UI.
+- **Animated stage backdrop** — multi-axis aurora made of three blurred radial gradients drifting slowly, soft 64-px grid masked to a centre vignette, animated grain, and **five blurred drifting orbs** as ambient atmosphere.
 - **Continuous neon dust motes** — small glowing specks in cyan / magenta / violet / white drift upward across the stage at all times.
-- **Glass overlays** — every overlay (hint, reveal, celebration, feature, winner, segue) is a translucent dark card with `backdrop-filter: blur()` and a neon border, with a thin animated cyan→magenta hairline along the top.
-- **Big chunky pill controls** — pill buttons for Begin Broadcast, +1 Aouadi / Siwar y Ahlem, Continue, Next, Back, Play; outline pills for Stop and Restart. Hover sheen + lift on every one.
-- **Big crossword cells** (64 px each) on a dark glass board, with a slow neon light-sweep (`cardSweep`) passing diagonally across the card every 7 s. The board sits at `top: 188px` (just below the team widgets) so the full grid stays comfortably above the floor.
-- **Team-coloured highlighting** — when a word is the focus, its cells stagger-pop in, glow cyan, and the **head cell's number badge zooms 2.6× with a glow halo**. A floating "№ N · Word · Horizontal · 12 Letras" banner pops in below the crossword.
+- **Glass overlays** — every overlay (hint, reveal, celebration, scoreboard-full, feature, winner, trip bumper, end loop) is a translucent dark card with `backdrop-filter: blur()` and a neon border + thin animated cyan→magenta hairline along the top.
+- **Big chunky pill controls** — `Empezar`, `+1 Aouadi`, `+1 Siwar y Ahlem`, `Continuar`, `Siguiente`, `Atrás`. Hover sheen + lift on every one.
+- **Big crossword cells** (64 px each) on a dark glass board, with a slow neon light-sweep passing diagonally every 7 s.
+- **Team-coloured highlighting** — when a word is the focus, its cells stagger-pop in, glow cyan, and the head cell's number badge zooms 2.6× with a glow halo. A floating "№ N · Palabra · Horizontal · 12 Letras" banner pops in below the crossword.
 
 ---
 
-## The 29-step flow
+## The 37-step flow
 
-1. **Pre-show** — animated cyan-to-magenta gradient title (`RINCONES / DEL MUNDO`), animated logo, ON AIR · 2026 pill, Begin Broadcast button (gradient pill with rotating sheen).
-2. **Countdown** — 3 / 2 / 1 in giant Space Grotesk inside three concentric counter-spinning neon rings; each digit fires a beep, "1" rolls into a sweep + fanfare.
-3. **Intro logo** — animated logo + gradient title (`RINCONES DEL MUNDO`), music-box fanfare. Auto-advances.
-4. **Per word, 6 sub-steps × 4 words = 24 steps:**
-   - **Highlight** — staggered cell pop on the word, head cell's number badge zooms up, floating word banner ("№ 1 · Palabra · Horizontal · 12 Letras") slides in below the board.
-   - **Hint** — glass card slides in:
-     - W1 (`SUPERMERCADO`): text hint (Spanish).
-     - W2 (`JOYERÍA`): three large emojis (💍 💎 ⌚) with rotation pop-in.
-     - W3 / W4 (`PROFESORA`, `INGENIERO`): no overlay; a cyan presenter cue near the bottom signals the host to introduce the word live.
-   - **Reveal** — full-screen gradient answer word with halo, sparkles, confetti, **streaks** (radial speed lines), 4-note triumphant chord, and the two custom +1 buttons (`+1 Aouadi`, `+1 Siwar y Ahlem`).
-   - **Celebration** — clicking +1 advances here automatically. A full-screen panel **eases in** showing the scoring team's gradient name (`Aouadi` or `Siwar y Ahlem`), a giant `+1` sting, the team's new score, and the player names. Particle burst (100 confetti + 10 streaks in the team colour) + a celebratory sting. After 2.4 s, the panel **eases out** and the team widget underneath shows a 2-second glow on the team's score. Then Next becomes available.
-   - **Intro replay** — pressing Next plays the show intro card (logo + title) again with theme music. Auto-advances after 2.2 s into the feature.
-   - **Feature** —
-     - W1 / W2 (video): a **host-controlled URL input** appears, pre-filled with the suggested YouTube URL. The host can paste any URL (`youtu.be/...`, `youtube.com/watch?v=...`, or already-`/embed/`) and click ▶ Play. The iframe loads with autoplay. A small Stop · Edit URL pill returns to the input.
-     - W3 / W4 (guest): a glass guest card with a circular cyan-ringed photo placeholder showing the guest's initial, their name in 5-rem display type (**Sarra Gharbi** for Profesora, **Majd Lahbib** for Ingeniero), profession label, and the word.
-     - Both have a "↩ Back to the Board" pill to advance.
-5. **Winner** — gradient team name (cyan ramp for `Aouadi`, magenta ramp for `Siwar y Ahlem`, violet ramp for `Empate · Tie`), animated rule, glass final-scores card, gradient Continue button. Confetti + streaks + 7-note victory fanfare with applause noise.
-6. **Segue** — graceful 1.2 s fade-in of a clean station bumper: small `Coming Up Next` mark, animated logo, gradient `RINCONES / DEL MUNDO` centred, "Más a continuación · Up Next: <activity>", thanks line, and a small **↺ Restart Show** pill in the bottom-right.
+Opening sequence:
+1. **Pre-show** — animated logo + cyan-to-magenta gradient title (`RINCONES / DEL MUNDO`), `EN VIVO · 2026` pill, `Empezar` button (gradient pill with rotating sheen). The first user click here also unlocks the Web Audio context so all subsequent SFX play.
+2. **Cuenta atrás** — 3 / 2 / 1 in giant Space Grotesk inside three concentric counter-spinning neon rings; each digit fires a beep, "1" rolls into a sweep + fanfare.
+3. **Logo splash** *(NEW)* — animated logo + gradient title, music-box fanfare. Auto-advances after ~2.5 s.
+4. **Equipo A intro** *(NEW)* — full-stage cyan reveal: `★ EQUIPO A ★` mark, big circular `A` badge with shine + bob, gradient `AOUADI` name, single-player roster, 80 cyan confetti + 10 streaks + celebrate sting. Auto-advances after ~3.5 s.
+5. **Equipo B intro** *(NEW)* — same but magenta, `B`, `SIWAR Y AHLEM`, two-player roster.
+6. **Logo splash again** *(NEW)* — short ~2 s reprise before the words begin.
 
-The video and guest words are intentionally split — videos for the first two words (so you have a media moment), then **guests live in the studio for the last two words** so the segment closes with people on camera.
+Per word, 7 sub-steps × 4 words = **28 steps**:
+- **Highlight** — staggered cell pop on the word, head cell's number badge zooms up, floating word banner ("№ 1 · Palabra · Horizontal · 12 Letras") slides in below the board.
+- **Pista** — glass card slides in with the hint:
+  - W1 SUPERMERCADO: emojis 🛒 🥬 💰
+  - W2 JOYERÍA: emojis 💍 💎 ⌚
+  - W3 PROFESORA: text "Trabajo en una escuela. Enseño a los estudiantes."
+  - W4 INGENIERO: text "Uso las matemáticas para construir edificios y puentes."
+  Every word now has a visual hint — there is no "presenter cue" mode anymore.
+- **Respuesta** — full-screen gradient answer word with halo, sparkles, confetti, streaks, 4-note triumphant chord, and the two custom +1 buttons (`+1 Aouadi`, `+1 Siwar y Ahlem`).
+- **Celebración** — clicking +1 advances here automatically. Full-screen panel eases in with the scoring team's gradient name, a giant `+1 Punto` sting, the team's new score, and the player names. Particle burst (100 confetti + 10 streaks in the team colour) + a celebratory sting. After 2.4 s the panel eases out and the floating team widget gets a 2-second score-glow. After another 1.2 s the show **auto-advances** into the fullscreen scoreboard.
+- **Marcador (scoreboard full-screen)** *(NEW)* — full-stage panel with two side-by-side glass cards: `Equipo A · Aouadi · score`, divider, `Equipo B · Siwar y Ahlem · score`. The 12 rem score numbers are gradient-clipped in each team's colour. Waits for `Siguiente`.
+- **Intro replay** — short logo reprise with theme music. Auto-advances after 2.2 s into the feature.
+- **Feature** —
+  - W1 / W2 (video): the iframe loads with `?autoplay=1&rel=0` the moment the step opens — no URL input, no Play / Stop. Audio is hard-stopped (`iframe.src = ""`) on every step transition (forward, back, or auto), so video sound never bleeds into the next step.
+  - W3 / W4 (guest): a real lower-third TV chyron — top strip with a pulsing red `EN VIVO` chip + 5-bar animated equalizer + 🎙 + show name; centre body with cyan/magenta colour stripes flanking the guest name (5.5 rem) and a pill-style title (`PROFESORA` / `INGENIERO`); bottom strip with `★ Rincones del Mundo · En Vivo ★` + `Palabra · <WORD>`. No profile photo — it reads like a real broadcast lower third.
+  - Both have an `↩ Al Tablero` pill that advances.
+
+Closing sequence:
+- **Ganador** *(UPGRADED)* — 🏆 trophy with zoom + bob, gradient team name (12 rem, cyan ramp for Aouadi, magenta for Siwar y Ahlem, violet for `Empate`), animated rule, glass final-scores card with 5.5 rem totals, gradient `Continuar →` button. 220 confetti + 26 streaks + 80 sparkles. Longer 11-note victory motif with sub-bass and a sustained C-major chord finale plus four layered applause noise bursts.
+- **Viaje a Turquía** *(NEW)* — looping broadcast bumper. Sky gradient (deep blue → cyan → ochre → orange), 4 drifting clouds, two ✈️ airplanes flying L→R on offset delays with a contrail, big gradient `VIAJE A TURQUÍA` headline pulse, and a `Rincones Travel · Agencia de Viajes · Estambul · Capadocia` agency banner. A synthesised airplane-engine pad (sawtooth + sine + lowpassed noise + 6 Hz tremolo) loops while the step is active. Stays animating until `Siguiente`.
+- **End loop** *(NEW)* — controls hide; the screen settles into a gentle infinite loop of the world-logo (bobbing) with the `Rincones del Mundo` tagline below. A calm low-volume sine pad plays a slow `C → Am → F → G` chord progression on a 6.5 s loop with smooth frequency ramps. The only way out is the small `↺ Reiniciar` pill in the bottom-right (page reload).
 
 ---
 
 ## Sound design (synthesized)
 
-Generated live by the Web Audio API; no audio files required.
+Generated live by the Web Audio API; no audio files required. Audio context unlocks on the first user gesture (`Empezar` click).
 
 | Cue | Trigger |
 |---|---|
-| Click | Spacebar / Next / Begin Broadcast / Stop |
-| Back | Back button / Left-arrow / Backspace |
-| Beep | Each countdown digit (3, 2, 1, with rising pitch) |
-| Go | After "1" — sawtooth sweep + noise burst into intro |
-| Fanfare | Intro logo + intro replay steps |
-| Shimmer | Word highlight + scoreboard score-glow + segue fade-in |
-| Swoosh | Hint / feature card slides in + ▶ Play video |
-| Tick | Each cell pop on highlight + each letter fill on reveal |
+| Click | Espacio / Siguiente / Empezar |
+| Back | Atrás / Left-arrow / Backspace |
+| Beep | Each cuenta-atrás digit (3, 2, 1, rising pitch) |
+| Go | After "1" — sawtooth sweep + noise burst into the splash |
+| Fanfare | Logo splash + intro replay |
+| Shimmer | Word highlight + scoreboard score-glow + scoreboard fullscreen |
+| Swoosh | Pista / feature card slides in |
+| Tick | Each cell pop on highlight + each letter fill on respuesta |
 | Reveal | 4-note major chord + bell tail + cymbal-ish noise |
 | Point | Cheerful chime on +1 (different pitch per team) |
-| Celebrate | Team-coloured 4-note arpeggio + sub bass + noise tail |
-| Whoosh | Reserved for short transitions |
-| Victory | 7-note grand fanfare + 3 layered applause noise bursts |
+| Celebrate | Team-coloured 4-note arpeggio + sub-bass + noise tail (also fires on team intros) |
+| Victory | 11-note rising fanfare + sustained C-major chord finale + sub-bass + four applause bursts |
+| Engine pad | Looped airplane rumble during the trip bumper (sawtooth + sine + lowpassed noise + 6 Hz tremolo) |
+| End-loop pad | Calm C / Am / F / G sine progression during the final loop |
 
-Mute everything with the round **♪ / ✕** pill (bottom-left of the stage) or **M**. The toggle was moved out of the top-right so the Team B widget could anchor cleanly in that corner.
+Mute everything with the round **♪ / ✕** pill (bottom-left of the stage) or **M**. Both looped pads stop on mute and re-fire on un-mute only if the current step still calls for them.
+
+The optional `<audio id="theme-song">` slot is retained — drop a file next to `index.html` and replace `REPLACE_WITH_THEME_SONG.mp3`. Its volume is **capped at 0.4** in code so it never drowns out the synthesized SFX.
 
 ---
 
@@ -79,24 +91,28 @@ Mute everything with the round **♪ / ✕** pill (bottom-left of the stage) or 
 
 | Action | How |
 |---|---|
-| Advance | **Spacebar** or click the floating **Next ▸** pill (gradient cyan) |
-| Step back | Click **◂ Back** pill, or press **Left-arrow** / **Backspace**. Stepping back across a reveal undoes the awarded point. |
-| Award a point | Click **+1 Aouadi** (cyan) or **+1 Siwar y Ahlem** (magenta) on the reveal screen |
-| Play the video | Type or paste a URL in the input, click **▶ Play** |
-| Stop the video | **■ Stop · Edit URL** pill — returns to the URL input |
-| Return to board | **↩ Back to the Board** or Spacebar |
-| Continue from winner | Click **Continue →** — fades into "Coming Up Next" |
-| Restart show | Tiny **↺ Restart Show** button on the segue |
+| Advance | **Espacio** or click the floating **Siguiente ▸** pill (gradient cyan) |
+| Step back | Click **◂ Atrás** pill, or press **Left-arrow** / **Backspace**. Stepping back across a respuesta undoes the awarded point. |
+| Award a point | Click **+1 Aouadi** (cyan) or **+1 Siwar y Ahlem** (magenta) on the respuesta screen |
+| Return to board | **↩ Al Tablero** or Espacio |
+| Continue from ganador | **Continuar →** — fades into the trip bumper |
+| Restart show | Tiny **↺ Reiniciar** pill on the end-loop |
 | Mute / unmute | Round **♪ / ✕** pill (bottom-left) or **M** |
 
-The reveal step blocks Spacebar / Next on purpose — you must click +1 to award and advance. Auto-advance steps (countdown, intro logo, intro replay) ignore Spacebar. The Spacebar / Backspace / M shortcuts also yield to text inputs (so you can type a URL without it being captured as a control).
+The respuesta step blocks Espacio / Siguiente on purpose — you must click +1 to award and advance. The `end_loop` step is also non-advanceable; only the `↺ Reiniciar` pill exits. Auto-advance steps (cuenta atrás, logo splash, team intros, intro replay, celebración → marcador) ignore Espacio.
+
+---
+
+## Stage scaling
+
+The stage renders internally at a fixed `1920 × 1080` and is scaled to fit the viewport with `transform: scale(min(w/1920, h/1080) * 0.97)`. The `0.97` safety multiplier keeps a small breathing margin around the edges so the floating bottom-right controls and bottom-left mute pill never reach the viewport boundary on tight or letterboxed displays. `scaleStage()` re-fires on `resize`, `orientationchange`, and once on `load`.
 
 ---
 
 ## Customizing for your class
 
 ### Team identity (top of `<body>`)
-Inside `<div class="scoreboard">`, the two `.team-card` blocks hold the team eyebrow, name, and player list. Swap `Aouadi` and `Siwar y Ahlem` for your own team names. The celebration overlay reads from `getPlayerNames("a"|"b")` and `getTeamName("a"|"b")` in the JS — keep those in sync if you want the celebration / winner cards to display real names.
+Inside `<div class="scoreboard">`, the two `.team-card` blocks hold the team eyebrow, name, and player list. Swap `Aouadi` and `Siwar y Ahlem` for your own team names. The celebration / team-intro / scoreboard-full / winner overlays read from `getPlayerNames("a"|"b")` and `getTeamName("a"|"b")` in the JS — keep those in sync if you want the on-air panels to display real names.
 
 ### Hints, video URLs, guests (top of `<script>`)
 The `WORDS` array. Each entry:
@@ -105,23 +121,20 @@ The `WORDS` array. Each entry:
   id: 1,
   word: "SUPERMERCADO",
   direction: "horizontal", startRow: 3, startCol: 1,
-  hint:    { kind: "text", value: "..." },                        // or kind: "emojis" / "none"
-  feature: { kind: "video", url: "https://www.youtube.com/embed/YiqBolcimm0" }
-                                                                  // or kind: "guest", name: "...", initial: "..."
+  hint:    { kind: "emojis", value: ["🛒", "🥬", "💰"] },           // or kind: "text", value: "..."
+  feature: { kind: "video",  url: "https://www.youtube.com/embed/YiqBolcimm0" }
+                                                                   // or kind: "guest", name: "...", title: "PROFESORA"
 }
 ```
-- `hint.kind` — `"text"`, `"emojis"` (array of 3), or `"none"` (presenter cue under the board).
-- `feature.kind` — `"video"` (with `url`; the input accepts `youtu.be/...`, `youtube.com/watch?v=...`, or `/embed/...`) or `"guest"` (with `name` and `initial`).
+- `hint.kind` — `"emojis"` (array of 3) or `"text"`. The old `"none"` mode has been removed; every word must have a visible hint.
+- `feature.kind` — `"video"` (with `url`; `toEmbedUrl()` accepts `youtu.be/<id>`, `youtube.com/watch?v=<id>`, or already-`/embed/<id>`) or `"guest"` (with `name` and `title`).
 
 Current guests:
 - **Profesora** — Sarra Gharbi (live in studio).
-- **Ingeniero** — Majd Lahbib (live in studio, ingeniero).
+- **Ingeniero** — Majd Lahbib (live in studio).
 
 ### Optional theme song
-The single `<audio id="theme-song">` slot is retained for an optional looping theme. Drop your file next to `index.html` and replace `REPLACE_WITH_THEME_SONG.mp3`. All other sound is synthesized.
-
-### "Coming Up Next" activity
-Edit `#up-next-title` near the bottom of `<body>` to whatever class activity follows.
+The `<audio id="theme-song">` slot still exists for an optional looping theme. Drop a file next to `index.html` and replace `REPLACE_WITH_THEME_SONG.mp3`. Its playback volume is capped at 0.4 in `tryPlay()` so the synthesized SFX always sit on top.
 
 ### Want different words?
 The grid coordinates are hardcoded for these specific four intersecting words. Swapping them means re-deriving `direction`, `startRow`, `startCol` so they cleanly intersect and shared cells agree on letters. Auto-layout is intentionally not done here.
@@ -134,17 +147,18 @@ The logo is built entirely in CSS (`.world-logo`, `.wl-bracket.*`, `.wl-globe`, 
 ## Tech details
 
 - **Single file**, no build step, no JS dependencies. Google Fonts (`Space Grotesk`, `Inter`) `@import`-ed; offline fallback to system sans-serif.
-- **16:9 fixed stage** — `1920×1080` rendered internally, scaled with `transform: scale(min(w/1920, h/1080))` on every window resize. Letterbox cleanly fills with the dark surround on any monitor (laptop, classroom, 4K projector).
-- **State machine** — flat 29-step `STEPS` array. `applyStep()` is the single source of truth. Transition timers are tracked in `state.pendingTimeout` / `state.pendingTimeout2` and cleared on every step change.
-- **Score history stack** — every awarded point is pushed onto `state.scoreHistory`. Stepping back across a reveal pops it and decrements the team that scored.
-- **Crossword** — 13×12 CSS grid, `gap: 0`, 64 px cells. Cells with no word are transparent; cells with letters are dark glass with a 1.5 px white outline; intersections render as one DOM cell.
+- **16:9 fixed stage** — `1920 × 1080` rendered internally, scaled with `transform: scale(min(w/1920, h/1080) * 0.97)` on every window resize / orientationchange / load. The `0.97` safety multiplier guarantees the floating controls and sound toggle never get clipped on edge cases.
+- **State machine** — flat 37-step `STEPS` array. `applyStep()` is the single source of truth. Transition timers are tracked in `state.pendingTimeout` / `state.pendingTimeout2` and cleared on every step change.
+- **Score history stack** — every awarded point is pushed onto `state.scoreHistory`. Stepping back across a respuesta pops it and decrements the team that scored.
+- **Crossword** — 13 × 12 CSS grid, `gap: 0`, **64 px** cells. Cells with no word are transparent; cells with letters are dark glass with a 1.5 px white outline; intersections render as one DOM cell.
 - **Floating team widgets** — two `position: absolute` glass cards anchored to the stage's top-left and top-right at 24 px inset. The wrapping `.scoreboard` element is `position: absolute; inset: 0; pointer-events: none` so the widgets sit on top of overlays without blocking clicks; the cards themselves restore `pointer-events: auto`. The score elements keep their original `id="score-a"` / `id="score-b"` so the existing `bump` / `glow` animations fire unchanged.
 - **World logo** — `.world-logo` is a CSS-only assembly: four `.wl-bracket` corner pieces using two pseudo-elements each to draw an L, four diagonals offset on a `wlBracket` keyframe, and a `.wl-globe` clipping mask containing a spinning `.wl-globe-sphere` (radial gloss + conic gradient) with two pseudo-element ellipses for the equator and meridian rings.
-- **Celebration step** — a single step with two CSS transition phases: `.active` → 2.4 s → `.shrinking` → 1.2 s → cleanup. The team widget underneath gets a `scoreGlow` keyframe at the same moment the panel begins to ease out.
-- **Video URL input** — `toEmbedUrl()` extracts the YouTube ID from `youtu.be/<id>` or `?v=<id>` and rebuilds an `/embed/<id>?autoplay=1&rel=0` URL.
-- **Web Audio SFX** — `osc()` + `noise()` helpers build oscillator and filtered-noise graphs on demand. Audio context unlocks on the first user gesture (Begin Broadcast). The `sfx` object exposes `click`, `back`, `tick`, `beep`, `go`, `fanfare`, `shimmer`, `swoosh`, `whoosh`, `reveal`, `point(team)`, `celebrate(team)`, `victory`.
+- **Celebración + Marcador chain** — the celebration overlay runs two CSS transition phases (`.active` → 2.4 s → `.shrinking` → 1.2 s) and then auto-calls `advance()`, dropping the show into the fullscreen scoreboard step. The corner widget's score-glow fires at the same moment the celebration panel begins to ease out.
+- **Video** — `playVideo(url)` builds an autoplay embed URL and assigns it to the iframe `src`. `stopVideo()` clears the `src`. `clearOverlays()` calls `stopVideo()` on every transition, so audio cannot leak past the feature step. `toEmbedUrl()` normalises `youtu.be/<id>` and `?v=<id>` URLs.
+- **Guest chyron** — the lower-third has no profile photo; it is a stack of three rows (top broadcast strip → name body with colour stripes → bottom broadcast strip). The `.guest-b` class on `#feature-guest` flips the stripe and pill colours for the second guest.
+- **Web Audio SFX** — `osc()` + `noise()` helpers build oscillator and filtered-noise graphs on demand. Audio context unlocks on the first user gesture (`Empezar` click). The `sfx` object exposes `click`, `back`, `tick`, `beep`, `go`, `fanfare`, `shimmer`, `swoosh`, `whoosh`, `reveal`, `point(team)`, `celebrate(team)`, `victory`. Two looped pads (`startEnginePad` / `stopEnginePad` and `startEndLoopPad` / `stopEndLoopPad`) drive the trip bumper and the end-loop respectively; both are torn down by `clearOverlays()` and the mute toggle.
 - **Particles** — `spawnConfetti`, `spawnSparkles`, `spawnStreaks` (radial speed lines), continuous ambient `dust`, and 5 large blurred floating `orb` divs.
-- **Keyboard shortcuts** — Space (advance), Left-arrow / Backspace (back), M (mute toggle). All yield when focus is in an `<input>` or `<textarea>` so the URL field works normally.
+- **Keyboard shortcuts** — Espacio (advance), Left-arrow / Backspace (back), M (mute toggle).
 
 ---
 
