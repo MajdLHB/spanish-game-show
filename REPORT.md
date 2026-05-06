@@ -4,6 +4,80 @@ A running log of what was built, in plain English. Each entry is dated and self-
 
 ---
 
+## 2026-05-06 (Rincones del Mundo) — Rebrand to "Rincones del Mundo", animated globe logo, real team identities, floating glass scoreboard widgets
+
+### Goal
+Final theming pass before showtime. The user wanted the show renamed end-to-end to **Rincones del Mundo** ("Corners of the World"), a custom animated logo that visually expresses that name, the real team identities baked into the UI (Aouadi as a one-player team and Siwar y Ahlem as a two-player team), and a redesign of the on-air scoreboard so the crossword has more vertical room. Everything was done in-place against the existing 2026 Edition.
+
+User asks driving this iteration:
+1. Rename the show to **Rincones del Mundo** everywhere — title, intro, intro replay, segue, end loop. Currently still says EL GRAN SHOW.
+2. Add an **animated logo** that represents "corners of the world": four L-shaped corner brackets pulsing outward with a rotating globe (gradient circle + meridian + equator) inside, gradient title `RINCONES / DEL MUNDO` below.
+3. **Team A = Aouadi** (1 player only). **Team B = Siwar y Ahlem** (2 players). Update everywhere: scoreboard widgets, celebration / intro / scoreboard-fullscreen / winner cards, and the `getPlayerNames()` JS helper.
+4. **Drop the top chyron header bar.** Replace with **two floating glass widgets** anchored top-left and top-right (~420 × 130 each), big enough to be readable: team tag, team name, big score number, color stripe accent. This frees vertical space, so make sure the crossword stays at 64-px cells and nothing visually shrinks.
+
+### Files touched
+
+| File | Action |
+|---|---|
+| `index.html` | Rebrand strings, new `.world-logo` component (CSS + markup in pre-show / intro / intro replay / segue), full replacement of the `.scoreboard` / `.team` / `.scoreboard-center` chyron CSS with two corner-anchored `.team-card` glass widgets, team labels swapped throughout the JS (`getPlayerNames`, new `getTeamName`, celebration + winner team-name lookups), board top moved from 200 → 188 to take advantage of the freed vertical space, sound toggle relocated bottom-left so it doesn't collide with Team B's widget. |
+| `README.md` | Rewritten for the Rincones del Mundo edition: new title, new logo description, new team identities, the floating-widget scoreboard, and a new "Want a different logo?" customization section. |
+| `REPORT.md` | This entry. |
+
+### What's new in this iteration
+
+#### Branding — "Rincones del Mundo"
+- `<title>` → `RINCONES DEL MUNDO — 2026`.
+- Pre-show, intro logo, intro replay, and segue logo all read **`RINCONES` / `DEL MUNDO`** with the existing cyan→magenta gradient + drop-shadow stack. Existing animations (`introZoom`, `replayZoom`, `titleBreathe`) are reused unchanged — the swap is purely text + supporting size.
+- Pre-show eyebrow now reads `★ RINCONES DEL MUNDO ★`.
+- The display sizes were dialed down so the new logo fits above the title without overflowing 1080 px: `.show-title` 14rem → 8rem, `.intro-headline` 14rem → 8rem (replay 11rem → 6.5rem), `.segue-logo` 14rem → 8rem. Pre-show gap 50 → 36 px and padding 80 → 60 px so the stack `live-pill → eyebrow → logo → title → subtitle → button` fits comfortably with breathing room.
+
+#### Animated `.world-logo` component
+- CSS-only. Four `.wl-bracket` L-shapes anchored to each corner of a square footprint sized by a `--size` custom property (with `.md` and `.sm` modifiers for 260 px and 210 px respectively; the default is 320 px for the intro-logo step).
+- Each bracket is built from two pseudo-elements (one horizontal arm, one vertical arm); they share a `wlBracket` 2.6 s alternate keyframe that translates them outward by ±10 px while easing opacity .82 → 1. The four corners are animation-staggered (0, .15, .3, .45 s) so the pulse rotates around the frame instead of all four moving in unison.
+- Diagonals share a colour: top-left and bottom-right are cyan, top-right and bottom-left are magenta — the two-tone keeps the logo aligned with the team palette.
+- The globe is a `.wl-globe` clipping mask wrapping a `.wl-globe-sphere`. The sphere has a `radial-gradient` highlight at 32%/28% over a `conic-gradient` of cyan → violet → magenta → cyan-2 → cyan, and spins once every 14 s (`wlGlobeSpin`). The wrapper itself bobs ±3 px on a 4 s alternate (`wlGlobeFloat`) so the whole logo feels alive even when the sphere is rotating uniformly.
+- Equator and meridian are the wrapper's `::before` and `::after` pseudo-elements: white-translucent ellipses (30% × 88% and 88% × 30% respectively) with a soft glow shadow, sitting on top of the spinning sphere so the rings stay still while the texture sweeps underneath.
+- Used in **pre-show** (`.md`), **intro logo** (default 320 px), **intro replay** (`.md`), and **segue** (`.sm`).
+
+#### Real team identities
+- `Team A → Aouadi`, single player, cyan stripe.
+- `Team B → Siwar y Ahlem`, two players (`Siwar`, `Ahlem`), magenta stripe.
+- Updates landed in:
+  - Scoreboard widget markup and the `<span>`-list of player names.
+  - Reveal screen +1 buttons (`+1 Aouadi`, `+1 Siwar y Ahlem`).
+  - Celebration overlay (default `Aouadi` text, single-name player list).
+  - Winner overlay (default name + final-scores card team tags).
+  - JS: `getPlayerNames("a")` → `["Aouadi"]`; `getPlayerNames("b")` → `["Siwar", "Ahlem"]`; new `getTeamName(team)` helper used by both the celebration and winner steps so future renames live in one place.
+- The `EQUIPO · TEAM A` / `EQUIPO · TEAM B` eyebrow tags are kept above the team names — they label the team's "letter" designation. The actual identity (`Aouadi`, `Siwar y Ahlem`) sits underneath in the bigger display type. This keeps the on-air UI bilingual and leaves room to retheme the team identity without touching the eyebrow.
+- `.celeb-team` and `.winner-team-name` font-size dropped from 13 rem to 10 rem so the longer `Siwar y Ahlem` string fits comfortably without wrapping.
+
+#### Scoreboard redesign — two floating glass widgets
+- The full-width chyron header bar (`.scoreboard` grid + `.team` columns + `.scoreboard-center` "EN VIVO · EL GRAN SHOW · Spanish Class · Crossword 2026" block) has been **removed entirely**.
+- Replaced with two corner-anchored `.team-card` widgets, each ~420 × 130 px, glass background with `backdrop-filter: blur(14px)`, 1-px white-translucent border, soft shadow, and a thin animated cyan→magenta hairline along the top.
+- Layout (Team A): `[stripe | info | score]`; Team B mirrors as `[score | info | stripe]`. The colour stripe is 5 px wide × 78% tall, in the team colour with a glow. Info column carries the small eyebrow `EQUIPO · TEAM A/B`, the team name in 1.65 rem display type, and player names in tracked Inter caps.
+- Score elements keep their original `id="score-a"` / `id="score-b"` so the existing `scoreBump`, `scoreBumpB`, `scoreGlow`, `scoreGlowB` animations fire unchanged. Their selectors were updated from `.team.b` to `.team-card.b`.
+- The wrapping `.scoreboard` is now `position: absolute; inset: 0; pointer-events: none` (it spans the whole stage). Each card sets `pointer-events: auto`. This means the widgets sit on top of overlays without intercepting clicks elsewhere, which matters during the celebration / reveal flows.
+- New `cardSlide` keyframe replaces the old `chyronSlide` — slides each card down 18 px on entry, 0.7 s, ease-out.
+
+#### Crossword breathing room
+- Board `top` 200 → 188 px (the team widget bottom edge is at 154 px, so this leaves 34 px clearance directly below). The board is horizontally centred and the widgets are at the corners, so they don't overlap regardless of clearance.
+- Cells stay at **64 px** as required. Crossword card padding (32/36 px), grid (12 × 64 = 768 px), board-mark + gap, all unchanged. Total board height ~888 px starting at 188 → ends at ~1076 px (safely inside the 1080 px stage).
+
+#### Sound toggle relocation
+- The round `♪ / ✕` mute pill was at top-right (24, 24) — Team B's widget now lives there. The toggle moved to bottom-left (28, 28) so it sits opposite the bottom-right floating Next/Back controls.
+
+### Things deliberately not done
+- The four words and grid coordinates are unchanged — same constraint as every prior edition.
+- The existing CSS `--team-a` / `--team-b` aliases are kept but the score animations now reference `--cyan` / `--magenta` directly so swapping the alias wouldn't accidentally rewire the bump / glow effect (they only need cyan/magenta, not theme indirection).
+- No `localStorage` for restart-resilience — refresh resets state. Restart Show pill on segue + hard reload remain the two restart paths.
+
+### How it was tested
+Static-built only — verified by tracing the step machine through all 29 states with the new strings, walking the CSS hand-merged into the existing 2026 Edition, and grepping for any leftover `EL GRAN`, `Player 1..4`, or `Team A/B` strings outside of the kept eyebrow tags. The two remaining `Equipo · Team A/B` matches are the small eyebrow labels above the team names — those are intentional designation labels, not identity strings.
+
+The user should open `index.html` in a browser to confirm the logo animation, the floating widget layout at the corners, and the celebration / winner team names before showtime.
+
+---
+
 ## 2026-05-06 (2026 Edition) — Modern broadcast redesign: Space Grotesk, cyan/magenta neon, celebration + intro-replay steps, host-controlled video input
 
 ### Goal
