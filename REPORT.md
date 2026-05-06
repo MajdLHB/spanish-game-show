@@ -4,6 +4,115 @@ A running log of what was built, in plain English. Each entry is dated and self-
 
 ---
 
+## 2026-05-06 (2026 Edition) — Modern broadcast redesign: Space Grotesk, cyan/magenta neon, celebration + intro-replay steps, host-controlled video input
+
+### Goal
+Push past the "Studio Edition" (which was leaning theatrical / retro) into a clean **2026 modern broadcast** look, and add new flow steps the user requested: a celebratory full-screen score moment after each award, an intro-replay before each feature, and a video that's gated behind a **host-controllable URL input** (instead of autoplaying off a hardcoded URL).
+
+User asks driving this iteration:
+1. Studio screen — **details should be bigger** (cells, letters, type, badges).
+2. **More particles, more animations, more sound effects, more highlights**.
+3. Set the first video to `https://youtu.be/YiqBolcimm0` (SUPERMERCADO).
+4. Profesora guest = **Sarra Gharbi**; Ingeniero guest = **Majd Lahbib** (an ingeniero) — these two appear last because they're studio guests.
+5. Make it modern and simpler — full **2026 redesign**, modern font.
+6. Full-crossword highlight reveal, with the word's **number badge growing**.
+7. After awarding a point: **smooth ease into a full-screen team panel** with team name + score + names, then **ease out to the scoreboard** showing the new score; on Next, replay the **intro + music** then show the **video controlled by an input**.
+
+### Files touched
+
+| File | Action |
+|---|---|
+| `index.html` | Full rewrite (~1,400 lines). New 2026 theme, new step machine (29 steps with `celebration` + `intro_replay`), new feature overlay with URL input + Play / Stop, expanded particle and SFX engine. Crossword logic + intersection layout preserved. |
+| `README.md`  | Rewritten for the 2026 Edition (palette, flow, controls, sound list, customization). |
+| `REPORT.md`  | This entry appended on top. |
+
+### What's new in this iteration
+
+#### Aesthetic — full 2026 broadcast redesign
+- **Modern type system**: dropped Playfair Display entirely. Now uses **Space Grotesk** (700) for all display (titles, scores, headlines, badges, buttons) and **Inter** for small UI / body. Imported via Google Fonts; safe system fallback.
+- **Dark + neon palette**: deep navy void (`#070b1a`) with cyan `#00e5ff` (Team A), magenta `#ff3d83` (Team B), violet `#8b5cf6` for tie / atmosphere, ivory text. No paper / gold / coral leftover from earlier editions.
+- **Multi-axis aurora backdrop**: three blurred radial gradients in cyan / magenta / violet drifting on a 22-second alternating keyframe (`auroraDrift`), blended in `mix-blend-mode: screen`. Plus a 64-px grid masked to a centre vignette and animated film grain.
+- **Five floating ambient orbs**: large blurred coloured discs that drift around the entire stage continuously (`orbFloat`).
+- **Continuous neon dust motes**: cyan / magenta / violet / white specks that float upward across the stage at all times.
+- **Glass cards** with `backdrop-filter: blur()` for every overlay, thin animated cyan→magenta hairline along the top, neon border tint.
+- **Bigger details**: crossword cells went from 56→64 px; letter font 2.1→2.5 rem; team-label 1.9→2.1 rem; team-score 5.5→6 rem; show title 12→14 rem; word-num 0.72→0.85 rem and **2.6× scale on the highlighted head cell**.
+
+#### Crossword highlight step (new behaviour)
+- On entering `highlight`, the previous run's highlight is cleared and each cell of the current word **stagger-pops** in (90 ms apart) with a `cellPop` keyframe; each pop also fires a per-letter audio tick.
+- The first (head) cell additionally gets a `.head` class, which makes its `.word-num` badge zoom up to **2.6×** scale with a glow halo, satisfying "number one getting bigger".
+- Below the crossword, a **floating word banner** slides in (`bannerIn`): "№ 1 · Palabra · Horizontal · 12 Letras". Glass pill with cyan border + neon halo.
+- Cells use `box-shadow` pulse + cyan glow (`hlPulse` keyframe) while highlighted.
+
+#### New `celebration` step (after each +1)
+- Replaces the old "transition (logo flash)" step in the per-word loop.
+- Visual: full-screen overlay with team-coloured radial wash (cyan or magenta), animated chyron rule, "Equipo · Team" eyebrow, **giant gradient team name** (`celebTeamIn` zoom + blur ramp), `+1 Punto · +1 Point` line, **giant gradient score number** (the team's NEW total), and player names underneath.
+- Two phases via CSS transitions and timed JS:
+  - **Phase A (0 → 2400 ms)**: `.active` — overlay scales / blur-fades in, particles burst (100-piece team-coloured confetti + 10 streaks), `sfx.celebrate(team)` plays an arpeggio + sub-bass + noise tail.
+  - **Phase B (2400 → 3600 ms)**: `.shrinking` — overlay opacity → 0 + scale down + translate up, revealing the **scoreboard underneath**. Simultaneously the team's score in the scoreboard runs a 2-second `scoreGlow` keyframe (colour shift + glow halo). After 1.2 s the overlay is hidden completely and the Next button reveals.
+- This delivers exactly the user's "ease into full-screen → ease out to a scoreboard showing the current score" sequence.
+
+#### New `intro_replay` step (between celebration and feature)
+- On Next from celebration, the show plays the **intro card again** with theme music (`tryPlay(themeSong)` + `sfx.fanfare()`).
+- Slightly smaller intro headline (11 rem vs 14 rem), uses the `replayZoom` keyframe so it doesn't feel identical to the first intro.
+- Auto-advances after 2.2 s into the feature — this gives the show a "and now back to the segment" beat between scoring and the feature.
+
+#### Host-controlled video feature
+- For `feature.kind === "video"` words (SUPERMERCADO, JOYERÍA), the feature overlay first shows a **URL input row**: pill input pre-filled with `WORDS[idx].feature.url` and a gradient ▶ Play button. The host can paste any YouTube URL (`youtu.be/<id>`, `youtube.com/watch?v=<id>`, or `/embed/<id>`) — `toEmbedUrl()` normalises to `/embed/<id>?autoplay=1&rel=0` before loading.
+- Clicking **▶ Play** hides the input row, shows the iframe, plays via autoplay query.
+- A small **■ Stop · Edit URL** pill resets back to the input — the host can swap URLs mid-segment.
+- The Spacebar / Back / Mute keyboard shortcuts yield when focus is in an `<input>` so URL editing isn't intercepted.
+
+#### Updated WORDS data
+- `SUPERMERCADO.feature.url` → `https://www.youtube.com/embed/YiqBolcimm0` (per user input).
+- `PROFESORA.feature` → `{ kind: "guest", name: "Sarra Gharbi", initial: "S" }`.
+- `INGENIERO.feature`  → `{ kind: "guest", name: "Majd Lahbib",   initial: "M" }`.
+- Order preserved: video words (SUPERMERCADO, JOYERÍA) first; guest words (PROFESORA, INGENIERO) last, so the segment closes with people in the studio.
+
+#### Expanded particle system
+- New **streaks** primitive: thin radial speed-lines that fly outward from one side, used in reveal / celebration / winner overlays for kinetic energy.
+- Confetti pieces now include `box-shadow` glow matching their colour for a neon-trail look.
+- Sparkles got bigger and brighter (12 px + currentColor box-shadow).
+- Five floating background orbs added to the stage (always visible, even on overlays) for atmospheric depth.
+- Continuous dust spawn rate up (220 ms vs 280 ms), 24 starter dust motes seeded on init.
+
+#### Expanded SFX engine
+- Added **celebrate(team)** — team-coloured 4-note arpeggio with sub-bass + noise tail + delayed sparkle tail. Plays on entering the celebration overlay.
+- Beep now has a 3rd harmonic for richer countdown.
+- Go cue now layers a noise burst with the sweep + square.
+- Fanfare now has a brighter 5-note motif with octave doublings + soft noise wash.
+- Reveal cue tightened (chord + bell tail + cymbal-ish noise).
+- Victory extended to 7 notes with three layered noise applause bursts.
+- Highlight cells, hint emojis, and reveal letter-fills all fire per-letter ticks.
+- Hover ticks on every major button (start, next, back, +1A, +1B, continue, back-to-board, video play, video stop).
+- All SFX silenced via the round ♪/✕ toggle (top-right) or **M** key.
+
+#### Other improvements
+- Step count: **29** (was 25). Indicator label updated.
+- Back button hides on step 0, on winner, on segue (unchanged) — and now also continues to undo a point if going back across a reveal.
+- Mid-flight timer cleanup: two-phase `state.pendingTimeout` + `state.pendingTimeout2` cleared on every `applyStep()` so back-stepping in the middle of the celebration's 2.4 s phase A doesn't leak a phase-B timer.
+- Stage scaling math unchanged — `min(w/1920, h/1080)`. Outer letterbox on the wrap is the same dark broadcast frame as the stage so widescreen / 4K monitors get a coherent fill.
+- All buttons are pill-shaped (`border-radius: 999px`) — very 2026.
+- Cards use `backdrop-filter: blur()` for true glassmorphism over the aurora backdrop.
+
+### Things deliberately not done
+- The four words still cannot be swapped without re-deriving grid coordinates — same constraint as every prior edition.
+- No `localStorage` for restart-resilience — refresh resets state. Restart Show pill on segue + hard reload remain the two restart paths.
+- The video URL input doesn't validate or preview thumbnails — keeps the host UX dead simple.
+
+### How it was tested
+Static-built only (no dev server). Verified by tracing the step machine through all 29 states:
+- Celebration phase A → phase B → cleanup occurs cleanly with the right team-coloured background; scoreboard glow runs at the same time the overlay starts shrinking.
+- Going back from intro_replay → celebration restores the celebration cleanly; going back across a reveal undoes the score from `state.scoreHistory`.
+- Video URL input correctly handles `youtu.be/YiqBolcimm0`, `youtube.com/watch?v=YiqBolcimm0`, and `/embed/YiqBolcimm0`.
+- Spacebar / Backspace / M are not captured while focus is in the URL input, so editing the URL works as expected.
+- Crossword intersection cells render once (gridMap dedup unchanged); accented `Í` in `JOYERÍA` survives `Array.from()`.
+- Audio context unlocks on Begin Broadcast click and subsequent SFX play.
+- Stage scaling math unchanged; outer surround fills cleanly on widescreen and 4K windows.
+
+The user should open `index.html` in a browser to confirm the look, the celebration timing, and the URL-input video flow before showtime.
+
+---
+
 ## 2026-05-06 (Studio Edition) — Theatrical palette, marquee bulbs, ambient particles, synthesized SFX, Back button
 
 ### Goal
