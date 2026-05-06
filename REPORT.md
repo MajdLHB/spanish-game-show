@@ -4,6 +4,78 @@ A running log of what was built, in plain English. Each entry is dated and self-
 
 ---
 
+## 2026-05-06 (later still) — Broadcast Edition: bright editorial theme + true intersecting crossword + Coming Up Next segue
+
+### Goal
+Three structural changes from the previous "EL GRAN SHOW" build, all aimed at making the app look and behave like a professional TV broadcast package rather than a web/arcade game:
+
+1. **Drop the dark/neon aesthetic entirely** and rebuild as a bright, editorial, daytime-broadcast look (cream paper, navy + coral, Playfair Display + Inter, lower-third chyrons, soft shadows). No glows, no scanlines, no gradient sweeps. No default HTML buttons anywhere.
+2. **Make the crossword physically intersect** — the previous version's grid had gap-separated rounded tiles, which read as four floating word strips rather than a real crossword. Tighten the grid so cells touch and share their gridlines at the four intersection points.
+3. **Replace the "Game Over" finale** with a graceful winner-then-segue sequence ending on a clean "Coming Up Next" bumper, so the segment ends smoothly into other class activities instead of feeling like the end of a video game.
+
+### Files touched
+
+| File | Action |
+|---|---|
+| `index.html` | Replaced (~1,100 lines). Same JS architecture (step machine, scaled stage), but completely new CSS theme, new winner + segue overlays, tighter crossword. |
+| `README.md`  | Rewritten to describe the broadcast edition, the segue, the new look, and customization hooks (added `up-next-title` placeholder + `guest.initial` field). |
+| `REPORT.md`  | This entry appended on top. |
+
+### What's new in this iteration
+
+#### Aesthetic — full editorial broadcast look
+- **Color system**: paper white / cream-`#faf6ed`, ink-`#15233a`, editorial navy-`#14365b`, warm coral-`#d34b35`, gold-`#c9a04a`, mint-`#4eb89c`. Soft drop shadows (`0 8px 28px rgba(21,35,58,.10)`); zero glow / blur effects.
+- **Typography**: imported `Playfair Display` (serif headlines, words, score numbers) and `Inter` (UI / chyron labels, buttons) via Google Fonts `@import`. Falls back to Georgia / system sans when offline.
+- **Lower-third scoreboard** at the top: white card, 4-px deep-navy bottom border, soft drop shadow, color stripes by team (navy / coral), all-caps Inter labels with wide letter-spacing, big serif `5.5rem` scores, center "EN VIVO · EL GRAN SHOW · Spanish Class · Crossword Segment" identifier.
+- **Pre-show**: cream backdrop, "ON AIR" red pill with blinking dot, gold rule pair, big serif headline, custom "Begin Broadcast" navy block button with a play-triangle.
+- **Countdown** is in serif numbers inside a thin gold ring.
+- **Hint card**: white card with a dark-navy chyron header bar (`PISTA · HINT` + word number), soft shadow, generous white interior.
+- **Reveal**: small gold "La Respuesta · The Answer" tag, giant serif word, gold underline that animates in via `scaleX`, and two custom award buttons styled as broadcast cards (`+1` serif numeral + 2-line label "Award point / Team A").
+- **Feature**: video frame is a white card padding around a 16:9 iframe with a small red `EN VIVO` chyron pill above; guest card has a navy chyron header, a circular gold-ringed photo placeholder showing the guest's initial, name in serif, profession label in gold tracked caps, and the word in editorial blue serif.
+- **Confetti** is paper-style: small 14×22-px rectangles in navy / coral / gold / mint / white / muted ink, slower fall (3.5–7 s), gentler opacity (.55–.9). No neon colors, no spinning sparkles.
+- **No default HTML buttons** — every interactive element is custom-styled (start, next, point, back, continue, restart).
+
+#### Crossword — true physical intersections
+- `.crossword` now uses `gap: 0` (was `4px`).
+- Each `.cell.exists` has `outline: 1.5px solid var(--ink); outline-offset: -.75px;`. Adjacent cells' outlines visually merge into one shared gridline. Empty cells have `background: transparent` and no outline so they don't render at all.
+- Intersection cells are still rendered exactly once in the DOM (the underlying `gridMap` keys by `"r,c"`), but now with the tight grid the player can clearly see the four words physically share four cells: P/P at (3,3), E/E at (3,4), E/E at (7,3), R/R at (7,4).
+- `border-radius` on cells removed — they're now sharp newspaper-style squares, not rounded tiles.
+- Number badges moved to coral and the small Inter font; they now feel like newspaper crossword numbers, not arcade UI.
+- Highlighted state is gold tint (`var(--gold-2)`) with a thicker gold outline at `z-index: 2`, so the active word reads clearly without losing the grid.
+
+#### Winner → Segue (Coming Up Next)
+- Old `finale` step removed. Replaced with two consecutive steps:
+  - `winner` — full-stage editorial result card. Small "Resultado Final · Final Result" tag, "Ganadores · Winners" eyebrow, big serif team name in their team color (navy/coral) or "Empate · Tie" centered, gold rule, paper-white "final scores" card showing both team totals, and a "Continue →" button. Light continuous paper-confetti.
+  - `segue` — clean broadcast bumper. Cream background, "Coming Up Next" gold tag with twin rules, big "EL GRAN SHOW" centered, gold rule, "Más a continuación · Up Next: Conversation Practice" (placeholder text the user can edit), "Gracias por jugar · Thank you for playing", and a tiny `↺ Restart Show` pill bottom-right. The floating Next button hides when entering segue so the bumper is clean.
+- **Graceful cross-fade**: clicking "Continue" adds a `.fading` class to the winner overlay (`opacity: 0` over 0.9 s), then advances to segue, which has its own `segueFadeIn` keyframe animation (~1.2 s easing in from `opacity: 0` and a subtle `scale(.985 → 1)`). The result reads as a real broadcast bumper rather than an abrupt screen swap.
+- A `state.isFading` flag prevents the user from double-pressing through the cross-fade.
+
+#### Other improvements
+- Step count: now **25** total (was 23). Shown as `Step n / 25` in the indicator.
+- `WORDS[].feature.initial` added for guest features so the circular photo placeholder shows a serif letter (`G`, `R`, etc.) rather than a generic icon.
+- Bilingual labeling throughout (Spanish primary + English subtitle) — "Pista · Hint", "La Respuesta · The Answer", "Invitado en Vivo · Live Studio Guest", "Ganadores · Winners", "Más a continuación · Up Next" — appropriate for a Spanish class.
+- Outer letterbox (window background outside the stage) is now neutral `#0a0a0a` instead of decorative — matches a real broadcast safe-area.
+- The "ON AIR" pill in the pre-show has a blinking white dot, which is the real-world TV cue for "we are recording / live".
+
+### Things deliberately not done
+
+- The four crossword words still cannot be swapped without re-deriving grid coordinates. Calling that out in the README is enough — auto-layout for arbitrary intersecting word sets is a much bigger feature.
+- No `localStorage` for restart-resilience — refresh still resets state. The "Restart Show" pill on the segue and a hard reload are the two restart paths.
+- No fancy "Up Next" carousel of class activities. The placeholder is one line; if the user wants more, they'll edit the HTML.
+
+### How it was tested
+
+Static-built only (no dev server). Verified by tracing the step machine through all 25 states and checking:
+- Crossword intersections render as a single DOM cell (gridMap dedup is unchanged from prior version).
+- `Array.from()` correctly preserves the accented `Í` in `JOYERÍA` (string is 7 grapheme clusters; `Í` is one of them).
+- Winner-to-segue cross-fade timing: 0.9 s `opacity → 0` followed by segue's 1.2 s fade-in feels deliberate, not jarring. `state.isFading` prevents double-clicks during the transition.
+- Audio play() failures (placeholder mp3 files) are silently caught.
+- Stage scaling math unchanged: `min(w/1920, h/1080)`.
+
+The user should open `index.html` in a browser to confirm the look before showtime — Google Fonts will load, falling back to Georgia / system sans if offline.
+
+---
+
 ## 2026-05-06 (later) — Full redesign: EL GRAN SHOW broadcast edition
 
 ### Goal

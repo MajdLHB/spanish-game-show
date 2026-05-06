@@ -1,108 +1,115 @@
-# EL GRAN SHOW — Spanish Class Game Show
+# EL GRAN SHOW — Broadcast Edition
 
-A single-file, broadcast-quality TV game show for a Spanish class. Two student teams compete to guess **4 intersecting Spanish words** on a crossword grid (`SUPERMERCADO`, `JOYERÍA`, `PROFESORA`, `INGENIERO`). The presenter advances the show one beat at a time using a floating "Next" button or the spacebar.
+A single-file, **broadcast-grade** TV game show for a Spanish class. It looks like a daytime morning show — cream and white surfaces, deep editorial navy and warm coral accents, Playfair Display serif headlines, sleek lower-third chyrons. No dark mode, no neon, no arcade vibe. Two student teams compete to guess **four physically-intersecting Spanish words** on a real crossword grid (`SUPERMERCADO`, `JOYERÍA`, `PROFESORA`, `INGENIERO`). The presenter advances the broadcast one beat at a time via a small bottom-right control or the spacebar.
 
-The whole game is one self-contained `index.html` file (HTML + CSS + JS). No build step, no server, no dependencies.
-
----
-
-## Highlights
-
-- **Fixed 16:9 stage (1920×1080)** that auto-scales to fit any window/projector — the layout never breaks regardless of resolution.
-- **Persistent broadcast scoreboard** at the top with Team A / Team B labels, two player-name placeholders per team, and big neon score numbers that bump-animate when a point is awarded.
-- **Hardcoded crossword** with verified intersections of all 4 words at letters P, E, E, R.
-- **Linear step machine** — 22 steps total, each advanced manually by the presenter (Next button or Spacebar) so you have full pacing control. A small step indicator in the corner shows where you are.
-- **Sleek dark-mode neon aesthetic** — neon blue / purple / pink / gold, animated background grid, subtle TV scanlines, gradient logo, glow effects, and smooth transitions throughout.
+The whole show is one self-contained `index.html`. No build step, no server, no dependencies (Google Fonts is loaded by `@import` for the premium typography; falls back gracefully when offline).
 
 ---
 
-## The flow (22 steps, presenter-paced)
+## The look
 
-1. **Pre-Show** — studio backdrop image and a giant pulsing "▶ START SHOW" button.
-2. **Countdown** — full-screen `3… 2… 1…` with the theme song kicking in.
-3. **Intro Logo** — animated "EL GRAN SHOW" with a zoom + gradient sweep, then auto-advances.
+- **Bright editorial palette** — cream paper `#faf6ed`, ink `#15233a`, editorial navy `#14365b`, warm coral `#d34b35`, gold `#c9a04a`. No glow effects, no neon, no scanlines.
+- **Typography** — Playfair Display (serif, for headlines / words / scores) and Inter (sans, for UI / chyron labels). Clean tracking and weights.
+- **Lower-third scoreboard** at the top of the stage: white card with deep-navy bottom border, color stripes by team, all-caps tracked Inter labels, big serif scores, and a center "EN VIVO · EL GRAN SHOW" identifier.
+- **Newspaper-style crossword** — white cells with crisp 1.5-px navy outlines, **`gap: 0` so cells physically touch and share their outlines at intersections**. Number badges in coral at the head of each word. Highlighted (current) word tints to gold. The four words actually share four cells on the grid: the `P` in `SUPERMERCADO`/`PROFESORA`, the `E` in `SUPERMERCADO`/`INGENIERO`, the `E` in `JOYERÍA`/`PROFESORA`, and the `R` in `JOYERÍA`/`INGENIERO`.
+- **Custom buttons everywhere** — pill / rectangle blocks with editorial type, soft drop shadows, no default browser styling.
+- **Paper confetti & soft particles** instead of neon sparkles — small navy / coral / gold / mint / white rectangles drifting at slower speeds, like a real broadcast.
+
+---
+
+## The flow (25 steps, presenter-paced)
+
+1. **Pre-show** — cream backdrop, "ON AIR" pill, gold rule, big "EL GRAN SHOW" headline, "BEGIN BROADCAST" button.
+2. **Countdown** — 3 / 2 / 1 in serif inside a thin gold ring; theme song fires here.
+3. **Intro logo** — animated full-stage logo card with thin gold rules above and below.
 4. **Per word, 5 sub-steps × 4 words = 20 steps:**
-   - **Highlight** — the current word's tiles pulse on the crossword grid.
-   - **Hint**:
-     - Word 1 (`SUPERMERCADO`) — text hint overlay.
-     - Word 2 (`JOYERÍA`) — three big animated emojis (💍 💎 ⌚).
-     - Words 3 & 4 (`PROFESORA`, `INGENIERO`) — no on-screen hint, just a small "🎤 EL PRESENTADOR INTRODUCE LA PALABRA" cue at the bottom signaling the host to introduce it live.
-   - **Reveal** — full-screen massive gradient word with sparkles + sound, plus two big buttons: `+1 POINT TEAM A` / `+1 POINT TEAM B`. Clicking one updates the global score and advances. The word's letters also fill into the board behind so it remains revealed.
-   - **Transition** — short logo flash with sound effect, then auto-advances.
-   - **Feature**:
-     - Words 1 & 2 — full-screen YouTube broadcast iframe.
-     - Words 3 & 4 — "★ INVITADO EN VIVO ★" guest title card with the word + a placeholder name.
-     - Both have a "↩ BACK TO BOARD" button (or press Next / Space).
-5. **Finale** — scoreboard and crossword are hidden. Full-screen results: bouncing trophy, gradient "WINNER: TEAM X" (or `EMPATE — TIE!` if scores are equal), the final score breakdown, CSS confetti rain, and a "🔄 PLAY AGAIN" button.
+   - **Highlight** — current word's tiles tint to gold and pulse subtly.
+   - **Hint** — navy chyron header, then:
+     - W1 (`SUPERMERCADO`): text hint.
+     - W2 (`JOYERÍA`): three large emojis (💍 💎 ⌚).
+     - W3 / W4 (`PROFESORA`, `INGENIERO`): no overlay; a small white "El presentador introduce la palabra" cue under the board signals the host to introduce the word live.
+   - **Reveal** — full-stage editorial answer card: small "La Respuesta" tag, giant serif word, gold underline, two custom Award-Point buttons (one navy for Team A, one coral for Team B). Letters fill into the crossword with a card-flip animation in the background.
+   - **Transition** — short logo flash (1.5 s + sound), auto-advances.
+   - **Feature** —
+     - W1 / W2: "Broadcast · Video" — clean white-framed YouTube iframe with a small red "EN VIVO" pill above.
+     - W3 / W4: "Invitado en Vivo · Live Studio Guest" — chyron card with a circular gold-ringed photo placeholder, the guest's name, profession label, and the word.
+     - Both have a "↩ Back to the Board" button.
+5. **Winner** — editorial result card: "Ganadores · Winners" eyebrow, big serif team name in their team color (or "Empate · Tie"), final scores card, and a "Continue →" button.
+6. **Segue ("Coming Up Next")** — when the host clicks "Continue", the winner card **gracefully fades** into a clean station bumper: thin gold rules, "EL GRAN SHOW" centered, "Más a continuación · Up Next: <activity>", "Gracias por jugar · Thank you for playing". The floating Next button hides so the bumper is clean. A small "↺ Restart Show" pill sits in the bottom-right corner if the host wants to run the show again.
+
+The Segue is **not** a "Game Over" screen — it is a graceful broadcast bumper that lets you transition smoothly into your next class activity.
+
+---
+
+## What changed in this version
+
+- **Aesthetic flipped from dark-neon to bright editorial broadcast** — every glow effect, scanline, gradient sweep, and neon color was removed. Colors and shadows are now soft and editorial; type is serif + sans on cream paper.
+- **Crossword intersections are physically shared** — `gap: 0` plus 1.5-px outlines on each cell, with one DOM cell per `(row, col)` regardless of how many words cross there. Adjacent cells' outlines overlap, producing one continuous grid line. Visually it now reads as a real newspaper crossword instead of separated tiles.
+- **No more "Game Over"** — the old `finale` step (Play Again button, big "WINNER!" with confetti) was split into:
+  - `winner` — the editorial result card with a "Continue →" button.
+  - `segue` — the clean "Coming Up Next" bumper that fades in over ~1 s as the winner card fades out.
+  Step count went from 23 to **25**.
+- **No default HTML buttons anywhere** — every interactive element (start, point, back, continue, next, restart) is custom-styled with editorial type, color blocks, and soft hover lifts.
 
 ---
 
 ## Customizing for your class
 
-All the easy-to-swap values are clearly marked with `// PLACEHOLDER` comments in the code.
+Everything you'd want to swap is clearly marked with `PLACEHOLDER` comments.
 
 ### Player names (top of `<body>`)
-Find the four `<span class="player-pill">` tags inside the `<div class="scoreboard">` block:
-```html
-<span class="player-pill">Player 1</span>
-<span class="player-pill">Player 2</span>
-…
-<span class="player-pill">Player 3</span>
-<span class="player-pill">Player 4</span>
-```
-Replace with your students' names.
+Inside the `<div class="scoreboard">` block, replace the `<span>Player 1</span>` etc. lines with your students' names.
 
-### Team labels
-Same scoreboard block — change the `<div class="team-label">TEAM A</div>` and `TEAM B` text if you want different team names.
+### Team names
+Same scoreboard — change `<div class="team-label">Team A</div>` / `Team B` and the `team-tag` lines if you want different team identifiers.
 
-### Hints, video URLs, and guest names
-Top of the `<script>` block, the `WORDS` array. Each entry has a `hint` and a `feature`:
+### Hints, video URLs, guest names (top of `<script>`)
+The `WORDS` array. Each entry has:
 ```js
 { id: 1, word: "SUPERMERCADO", direction: "horizontal", startRow: 3, startCol: 1,
-  hint:    { kind: "text", value: "Aquí compras tu comida cada semana…" },
-  feature: { kind: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" } // PLACEHOLDER — replace
+  hint:    { kind: "text", value: "..." },                  // or kind: "emojis" / "none"
+  feature: { kind: "video", url: "https://www.youtube.com/embed/..." } // or kind: "guest"
 },
 ```
-- `hint.kind` can be `"text"`, `"emojis"` (array of 3), or `"none"`.
-- `feature.kind` can be `"video"` (with `url`, use the YouTube `/embed/` form) or `"guest"` (with `name`).
+- `hint.kind`: `"text"` (string), `"emojis"` (array of 3), or `"none"` (presenter cue).
+- `feature.kind`: `"video"` (with `url`, use the `/embed/` form) or `"guest"` (with `name` and `initial`).
 
-### Audio (theme song, logo flash, reveal)
-Three `<audio>` tags near the top of the stage. Drop your own files next to `index.html` and update the `src` attributes:
+### Audio (theme, logo flash, reveal)
+Three `<audio>` tags inside the stage. Drop your files next to `index.html` and update the three `REPLACE_WITH_*.mp3` `src` values.
+
+### "Coming Up Next" activity title
+At the bottom of `<body>`, inside the segue overlay:
 ```html
-<source src="REPLACE_WITH_THEME_SONG.mp3"        type="audio/mpeg">
-<source src="REPLACE_WITH_LOGO_FLASH_SOUND.mp3"  type="audio/mpeg">
-<source src="REPLACE_WITH_REVEAL_SOUND.mp3"      type="audio/mpeg">
+<div class="segue-up-next-title" id="up-next-title">Conversation Practice</div>
 ```
+Change the text to whatever class activity is coming up next (or remove it entirely).
 
-### Pre-show studio image
-The pre-show background is a placeholder Unsplash URL inside `.preshow-bg`. Replace the URL with your own studio image, or drop a local file next to `index.html` and reference it.
-
-### Want to swap out the 4 words?
-The grid is hardcoded for these specific intersections — if you change the words, you'll also need to re-derive `startRow` / `startCol` / `direction` so they intersect cleanly. The intersections used here are documented as an ASCII diagram inside the `WORDS` block.
+### Want different words?
+The grid coordinates are hardcoded for these specific four words and the four shared-letter intersections. Swapping in different words means re-deriving `direction`, `startRow`, `startCol` so they cleanly intersect and the shared cells agree on letters. The full ASCII layout diagram is in the comment above the `WORDS` array — start there.
 
 ---
 
-## Host controls (presenter cheat-sheet)
+## Host controls
 
 | Action | How |
 |---|---|
-| Advance to next step | **Spacebar** or click the floating **NEXT ▶** button (bottom-right) |
-| Award a point | Click **+1 POINT · TEAM A** or **+1 POINT · TEAM B** on the reveal screen (this also advances) |
-| Return to board from a feature | Click **↩ BACK TO BOARD** or press Spacebar |
-| Restart the whole show | Click **🔄 PLAY AGAIN** on the finale screen |
-| Step indicator | Bottom-right corner shows `STEP n / 22` |
+| Advance to next step | **Spacebar** or click the floating **Next ▸** in the bottom-right |
+| Award a point | Click **+1 Team A** or **+1 Team B** on the reveal screen (also advances) |
+| Return to board after a feature | Click **↩ Back to the Board** or press Spacebar |
+| End the segment gracefully | Click **Continue →** on the winner screen — fades into "Coming Up Next" |
+| Run the show again | Tiny **↺ Restart Show** button in the bottom-right of the segue |
 
-Reveal step **does not** advance via Spacebar — you must click one of the point buttons. Countdown / intro-logo / logo-flash steps auto-advance and ignore Spacebar.
+The reveal step blocks Spacebar / Next on purpose — you must click one of the Award-Point buttons to award and advance. Auto-advance steps (countdown, intro logo, logo flash) ignore Spacebar.
 
 ---
 
 ## Tech details
 
-- **Single file**, no dependencies, no build.
-- **16:9 stage** is implemented with a `1920×1080` element transformed by `scale(min(window.width/1920, window.height/1080))`. Crisp on any monitor or projector.
-- **State machine** is a flat `STEPS` array (22 entries); `state.step` is the index. Each `applyStep()` call sets up the layers/overlays for that beat.
-- **Crossword** is a CSS-grid 13×12 board; non-word cells are `visibility: hidden` placeholders so the grid stays a clean rectangle.
-- **Browsers**: tested mentally against Chrome / Edge / Firefox / Safari. Audio autoplay starts only after the user clicks "Start Show" (browser policy compliant).
+- **Single file**, no build step, no JS dependencies. Google Fonts (`Playfair Display`, `Inter`) is `@import`-ed; if offline, fonts fall back to Georgia / system sans.
+- **16:9 fixed stage** — `1920×1080` rendered internally, scaled with `transform: scale(min(w/1920, h/1080))` on each window resize. Layout is pixel-correct on any monitor or projector.
+- **State machine** — flat 25-step `STEPS` array with `state.step` index. `applyStep()` is the single source of truth for what the screen looks like.
+- **Crossword** — 13×12 CSS-grid with `gap: 0`. Cells with no word use `background: transparent`; cells with letters have `outline: 1.5px solid var(--ink)` so adjacent cells share the same line. Intersections render as one DOM cell.
+- **Cross-fade** between winner and segue — winner gets a `.fading` class that animates `opacity → 0` over 0.9 s; segue's `.active` runs a `segueFadeIn` keyframe (~1.2 s).
 
 ---
 
