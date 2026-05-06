@@ -4,6 +4,121 @@ A running log of what was built, in plain English. Each entry is dated and self-
 
 ---
 
+## 2026-05-06 (Showtime polish) — Stage-fit safety, Spanish-only copy, autoplay video, TV-chyron guest card, post-celebration scoreboard, opening team intros, upgraded winner, Turkey-trip bumper + end-loop, theme volume cap
+
+### Goal
+Final polish pass before the live class. The user wanted:
+
+1. **Stage / screen-fit fixes**: a 0.97 safety multiplier in `scaleStage()` so floating controls / sound toggle never reach the viewport edge; controls moved inward to (40, 40); sound toggle moved to bottom-left so it doesn't collide with the new top-right Team B widget; `scaleStage()` re-fired on `resize` + `orientationchange` + `load`.
+2. **New opening sequence** before the words: `preshow → cuenta atrás → logo_splash (~2.5 s) → team_intro A → team_intro B → logo_splash (~2.0 s) → words`.
+3. **New post-celebration step**: after a +1, the celebration full-screen team panel auto-advances into a fullscreen `Marcador` showing both teams' giant scores; that step waits for `Siguiente` before flowing into the intro replay → feature.
+4. **All four words get hints** — drop the `"none"` mode entirely. SUPERMERCADO and JOYERÍA use emojis; PROFESORA and INGENIERO use short A1 / A2 Spanish text. The presenter-cue element is removed from HTML, CSS, and JS.
+5. **Video feature autoplay, no input** — drop the URL input row and the Play / Stop buttons; iframe loads with `?autoplay=1` the moment the feature step opens; `iframe.src = ""` is called inside `clearOverlays()` so any step transition (forward, back, or auto) hard-stops the audio. `toEmbedUrl()` retained.
+6. **Guest card → TV chyron**, no profile picture: top strip with pulsing red `EN VIVO` dot + 5-bar animated equalizer + 🎙 mic + show name; centred name flanked by colour stripes; pill-style title (`PROFESORA` / `INGENIERO`); bottom strip with `★ Rincones del Mundo · En Vivo ★` and `Palabra · <WORD>`.
+7. **Spanish-only on-air copy** — every English half of bilingual strings stripped; only Spanish remains.
+8. **New ending sequence** replacing the old segue: `Ganador (UPGRADED) → Viaje a Turquía bumper → end_loop`.
+9. **Audio context** unlocks on the first `Empezar` click (unchanged); **theme song** volume capped at 0.4 in `tryPlay()`; **step indicator** default reflects the new total (37).
+
+### Files touched
+
+| File | Action |
+|---|---|
+| `index.html` | Major surgery: scaling math, floating-control geometry, full Spanish-only copy pass, hint logic simplification, presenter-cue removal, video autoplay rewrite, guest chyron rebuild, new `team-intro` and `scoreboard-full` layers + steps, winner upgrade, new `turkey-trip` and `end-loop` layers + steps, two new looped Web Audio pads (engine + chord pad), step count → 37. |
+| `README.md` | Rewritten end-to-end: 37-step flow, opening team intros, scoreboard-full post-celebration, autoplay video + chyron guest card, upgraded winner + Turkey-trip + end-loop, Spanish-only controls, theme-volume cap, customization sections updated for `hint.kind` (`emojis`/`text` only) and `feature.kind = "guest"` (now `name` + `title`, not `initial`). |
+| `REPORT.md` | This entry. |
+
+### What changed in detail
+
+#### Stage-fit safety
+- `scaleStage()` now applies a `0.97` multiplier to the computed `min(w/1920, h/1080)` scale, so there's always a small breathing margin around the 1920 × 1080 canvas.
+- Re-fires on `resize`, `orientationchange`, and once on `load` (in addition to the initial call).
+- `.controls` moved from `(28, 28)` to `(40, 40)`; `.sound-toggle` moved from top-right to `(40, 40)` bottom-left so it doesn't collide with Equipo B's widget.
+
+#### New opening sequence
+- The old single `intro_logo` step was renamed to `logo_splash` and given a per-step `duration` field. STEPS now go `preshow → countdown → logo_splash (2500) → team_intro A → team_intro B → logo_splash (2000) → words…`.
+- New `.team-intro` layer: full-stage team-coloured wash, `★ EQUIPO A ★` / `★ EQUIPO B ★` mark, big circular `A` / `B` badge with `tiBadgeIn` zoom + `tiBadgeFloat` bob, gradient name (`AOUADI` / `SIWAR Y AHLEM`, 9 rem) with `tiNameIn` enter, player roster with `tiPlayersIn` enter, 80 confetti + 10 streaks in the team colour, `sfx.celebrate(team)` sting. Same DOM element re-used for both teams via the `.team-b` class toggle; old particles are stripped between teams.
+- Step duration: 3.5 s auto-advance for each team intro.
+
+#### Post-celebration scoreboard fullscreen
+- New `.scoreboard-full` layer + `scoreboard_fullscreen` step kind. Inserted between `celebration` and `intro_replay` for every word.
+- Layout: small `Marcador` tag with twin rules, then a 1600 px-wide grid of two glass team cards separated by a vertical divider. Each card has a top hairline in the team colour, eyebrow (`Equipo A` / `Equipo B`), 3 rem name, and a 12 rem score number gradient-clipped to white → cyan / magenta. `sfTeamIn` blur-up on entry (Equipo B delayed 0.15 s).
+- Celebration auto-advances into this step (no manual click between celebración and the marcador). The step itself waits for `Siguiente`.
+
+#### All-words hints, presenter-cue gone
+- `WORDS` updated:
+  - W1 SUPERMERCADO: emoji hint `[🛒, 🥬, 💰]` (was: descriptive Spanish text).
+  - W2 JOYERÍA: emoji hint `[💍, 💎, ⌚]` (unchanged).
+  - W3 PROFESORA: text hint `Trabajo en una escuela. Enseño a los estudiantes.`
+  - W4 INGENIERO: text hint `Uso las matemáticas para construir edificios y puentes.`
+- The `hint.kind === "none"` branch deleted from `applyStep()`. The remaining logic is just `kind === "emojis"` (3-emoji card with rotation pop-in + per-emoji ticks) or `kind === "text"` (large bilingual-style hint text).
+- `.presenter-cue` HTML element, CSS block, `els.presenterCue` reference, and the `els.presenterCue.classList.remove("active")` reset call all removed.
+
+#### Video feature: autoplay, no UI
+- Dropped `.video-input-row` (input + Play button) and `.video-stop` button + `.video-actions` row, plus all of their CSS.
+- New `playVideo(url)` builds an autoplay-friendly embed URL (`<embed>?autoplay=1&rel=0`) and sets `iframe.src`. `stopVideo()` clears `iframe.src`.
+- `clearOverlays()` now calls `stopVideo()` on every step change — forward, back, or auto — so video audio never bleeds past the feature step. The Back button also picks this up automatically because `goBack()` calls `applyStep()`.
+- `toEmbedUrl()` is kept so the WORDS array can hold any `youtu.be/<id>`, `watch?v=<id>`, or `/embed/<id>` URL.
+
+#### Guest card → TV chyron
+- The circular `S` / `M` photo and `photoBreathe` keyframe deleted.
+- New three-row chyron:
+  - **Top strip**: red gradient bar with a pulsing live dot (`gsLiveBlink`), a 5-bar animated equalizer (`gsEqBar`, staggered), 🎙 mic glyph, spacer, show name `RINCONES DEL MUNDO` on the right.
+  - **Body**: 12-px cyan stripe / centred name + title pill / 12-px magenta stripe. Name is 5.5 rem display; title is a tracked, bordered pill (`PROFESORA` or `INGENIERO`). The `.guest-b` modifier on `#feature-guest` flips the stripe and pill colours so the two guests don't read as identical cards.
+  - **Bottom strip**: `★ Rincones del Mundo · En Vivo ★` on the left, `Palabra · <WORD>` on the right with the word in magenta + tracked.
+- WORDS guest entries now use `{name, title}`. The old `initial` field is gone.
+
+#### Spanish-only copy pass
+- `EN VIVO · 2026`, `Empezar`, `Pista`, `Respuesta`, `Punto para`, `Equipo`, `+1 Punto`, `Marcador`, `Resultado Final`, `Ganador`, `Empate`, `Continuar`, `↩ Al Tablero`, `Atrás`, `Siguiente`, `Espacio`, `Paso n / N`, `Silenciar (M)`, `Sonido encendido (M)`, `Sonido apagado (M)`, `Palabra` (banner), `Clase de Español · Crucigrama`, `Clase de Español` (intro), `Juego de Palabras · 2026`, `Próximo`, `★ Equipo A ★`, `★ Equipo B ★`, `Equipo A` / `Equipo B` (sf eyebrow), `El Crucigrama` (board mark).
+- Two remaining `Equipo A` / `Equipo B` in the corner widgets are intentional — they are designation eyebrows above the team identity, not bilingual subtitles.
+- The trip bumper and end-loop are also Spanish-only: `EN VIVO · BUMPER`, `VIAJE A TURQUÍA`, `RINCONES TRAVEL · AGENCIA DE VIAJES · ESTAMBUL · CAPADOCIA`, `RINCONES DEL MUNDO`, `↺ REINICIAR`.
+
+#### Upgraded `winner` step
+- New `🏆 .winner-trophy` element with `winnerTrophy` zoom + rotate-in and a `winnerTrophyBob` 3 s alternate bob. Gold drop-shadow stack.
+- Team name 10 → 12 rem.
+- Particle counts on entry: 220 confetti + 26 streaks + 80 sparkles (was 120 / 14 / 0).
+- `sfx.victory()` rewritten to be longer and more triumphant: 11-note rising motif (G3 → G6), each note layered with a sub-octave triangle and a high sine harmonic; a sustained C-major chord (C5 / E5 / G5 / C6) at the 2.3 s mark; sub-bass C3 sine for the full 3.5 s; four staggered applause noise bursts.
+
+#### New ending: Turkey-trip bumper → End-loop
+- Old `.segue-overlay` layer + `segue` step kind deleted.
+- **`turkey_trip`** layer (`.turkey-trip` + step kind):
+  - Sky gradient backdrop (deep blue → cyan → ochre → orange).
+  - Four `.tt-cloud` divs at varied widths and heights, each looping a `ttCloudDrift` translation across 30 – 50 s with negative `--delay` offsets so the sky never feels static.
+  - Two `.tt-airplane` ✈️ emojis on `ttPlaneFly` 7 s loops with offset delays. Each has a CSS `::after` contrail trailing behind. They translate from `-300px` to `2300px` with a midpoint `-22 px` lift, so they feel like they ride a small thermal.
+  - Centre column: small `EN VIVO · BUMPER` mark with a pulsing red dot, big gradient `VIAJE A TURQUÍA` (13 rem) with a slow `ttHeadlinePulse` scale breath, and the `Rincones Travel · Agencia de Viajes · Estambul · Capadocia` red-to-gold pill banner with bullet separators.
+  - Synthesised airplane-engine pad loops while the step is active: sawtooth (64 Hz) + sine (96 Hz) through a 380 Hz lowpass, plus filtered noise (lowpass 900 Hz) for jet wash, plus a 6 Hz LFO modulating the master gain for tremolo. `startEnginePad()` ramps in over 1.4 s; `stopEnginePad()` ramps out over 0.6 s before stopping the nodes.
+  - Stays animating until `Siguiente`.
+- **`end_loop`** layer (`.end-loop` + step kind):
+  - Calm dark navy + cyan / magenta radials.
+  - Centred `.world-logo` (default 320 px size) with a slow `elLogoBob` ±6 px alternate so the static screen never feels frozen, plus the `.el-tagline` `Rincones del Mundo` gradient title pulsing on `elTaglineBreathe`.
+  - The floating controls are hidden (`els.controls.style.display = "none"`); the only exit is the `↺ Reiniciar` pill (bottom-right) which calls `location.reload()`.
+  - Synthesised calm sine pad: three voices started on a C major triad (C4 / E4 / G4), then re-tuned every 6.5 s through `Am → F → G → C` via `exponentialRampToValueAtTime` over 2.2 s. Master gain sits at 0.07. `startEndLoopPad()` ramps in over 2 s; `stopEndLoopPad()` ramps out over 1 s.
+  - Both pads are torn down by `clearOverlays()` and on mute. `toggleSound()` re-fires the appropriate pad on un-mute only when the current step still calls for it.
+  - `advance()` is gated: `end_loop` blocks the keyboard / Siguiente shortcut, since the only exit is the page reload.
+
+#### Audio + theme song
+- Audio context still unlocks on the first user gesture (the `Empezar` click handler calls `ensureAudioCtx()` before `sfx.click()`).
+- `tryPlay(audio, vol)` is now `audio.volume = max(0, min(0.4, vol))` — capped at 0.4 so the optional theme song never drowns out the synthesized SFX. Existing call sites pass `0.5` and `0.4`; both end up at `≤ 0.4`.
+- The optional `<audio id="theme-song">` slot is unchanged in HTML.
+
+#### Step count
+- New `STEPS` length: 37 (was 35 in the previous iteration).
+  - 6 opening: preshow, countdown, logo_splash, team_intro A, team_intro B, logo_splash.
+  - 28 per-word: 4 words × 7 (highlight, hint, reveal, celebration, scoreboard_fullscreen, intro_replay, feature).
+  - 3 closing: winner, turkey_trip, end_loop.
+- Step indicator default text in HTML updated to `Paso 1 / 37` (the JS overwrites it anyway, but the static fallback now matches).
+
+### Things deliberately not done
+- Auto-layout for arbitrary words — same constraint as every prior edition; the four crossword words are still hardcoded.
+- No `localStorage` restart-resilience — refresh resets state. The `↺ Reiniciar` pill on `end_loop` is the only built-in restart path.
+- No back-button navigation out of `end_loop` — only the Reiniciar pill exits.
+
+### How it was tested
+Static-built only — verified by tracing the step machine through all 37 states, grepping for any leftover `EL GRAN`, `Player 1..4`, `Spanish Class`, `Begin Broadcast`, `Coming Up`, `Up Next`, `Game of Words`, `presenter`, `segueOverlay`, `videoPlayBtn`, `videoStopBtn`, `videoInputRow`, `videoUrlInput`, `guestPhoto`, or `showVideoInput` strings. None remain.
+
+The user should open `index.html` in a browser and walk the entire 37-step flow to confirm: the celebration → marcador hand-off feels seamless; the team-intro animations and confetti reset cleanly between A and B; the autoplay video works on the first feature step and stops audibly on Siguiente; the chyron guest card reads as a real lower-third (no profile photo); the trophy and longer fanfare make the winner feel celebratory; the Turkey-trip bumper loops the airplane indefinitely with engine pad audio; and the end-loop sits calmly with the chord pad until Reiniciar.
+
+---
+
 ## 2026-05-06 (Rincones del Mundo) — Rebrand to "Rincones del Mundo", animated globe logo, real team identities, floating glass scoreboard widgets
 
 ### Goal

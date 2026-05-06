@@ -2513,7 +2513,7 @@ button, input { font-family: inherit; }
         <span class="arrow">◂</span>
         Atrás
       </button>
-      <div class="step-indicator" id="step-indicator">Paso 1 / 29</div>
+      <div class="step-indicator" id="step-indicator">Paso 1 / 37</div>
       <button class="ctrl-btn next-btn hidden" id="next-btn">
         Siguiente
         <span class="kbd">Espacio</span>
@@ -2803,7 +2803,9 @@ function clearAutoTimers() {
 }
 function tryPlay(audio, vol = 1) {
   if (!state.soundOn) return;
-  try { audio.currentTime = 0; audio.volume = vol; audio.play().catch(() => {}); } catch (_) {}
+  // 0.4 ceiling for the optional theme song so it never drowns out synthesized SFX
+  const v = Math.max(0, Math.min(0.4, vol));
+  try { audio.currentTime = 0; audio.volume = v; audio.play().catch(() => {}); } catch (_) {}
 }
 
 function getPlayerNames(team) {
