@@ -3687,13 +3687,32 @@ function ensureBufferedVideo(url) {
   if (v) return v;
   if (!els.videoFrameInner) return null;
   v = document.createElement("video");
-  v.src = url;
-  v.preload = "auto";        // download the whole file ASAP
-  v.playsInline = true;       // iOS: don't take over the screen
-  v.controls = true;          // operator can scrub / play if autoplay blocked
+  v.src = url;                // immediate streaming-style preload (Range requests)
+  v.preload = "auto";          // browser may download aggressively
+  v.playsInline = true;        // iOS: don't take over the screen
+  v.controls = true;           // operator can scrub / play if autoplay blocked
   els.videoFrameInner.appendChild(v);
   VIDEO_BUFFERS.set(url, v);
   try { v.load(); } catch (_) {}
+
+  // Aggressive head start: alongside the <video>'s own preload, fetch the
+  // entire file as a Blob into JS memory. Once resident, swap the <video>'s
+  // src to a blob: URL so play() runs with ZERO network activity — even if
+  // connectivity drops mid-show, playback is unaffected. Skip the swap if
+  // the element is already in use (don't interrupt the operator).
+  fetch(url, { mode: "cors", credentials: "omit", cache: "force-cache" })
+    .then(r => r.ok ? r.blob() : null)
+    .then(blob => {
+      if (!blob) return;
+      if (v.classList.contains("active")) return; // currently visible — leave it
+      try {
+        const blobUrl = URL.createObjectURL(blob);
+        v.src = blobUrl;
+        v.load();
+      } catch (_) {}
+    })
+    .catch(() => { /* streaming src above keeps the segment playable */ });
+
   return v;
 }
 
