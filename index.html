@@ -2500,6 +2500,40 @@ button, input { font-family: inherit; }
   .stage-wrap { display: none !important; }
   .rotate-prompt { display: flex; }
 }
+
+/* ============================================================
+   14. VIDEO PLAYBACK PERF
+   When a feature video is playing the show's many decorative
+   animations (aurora, grain, orbs, dust, world-logo, team cards,
+   etc.) starve the main thread and the video drops frames. They
+   sit BEHIND the full-screen feature overlay anyway, so we hide
+   the ones the user can't see and pause animations on the few
+   that remain visible (small show-logo bug, team cards). Promote
+   the <video> to its own GPU compositing layer so remaining
+   repaints don't touch its texture.
+============================================================ */
+body.video-playing .aurora,
+body.video-playing .grain,
+body.video-playing .orbs,
+body.video-playing .ambient,
+body.video-playing .ambient .dust {
+  display: none !important;
+}
+body.video-playing .stage::before,
+body.video-playing .stage::after {
+  animation-play-state: paused !important;
+}
+body.video-playing .team-card,
+body.video-playing .team-card *,
+body.video-playing .fv-show-logo,
+body.video-playing .fv-show-logo * {
+  animation-play-state: paused !important;
+}
+.video-frame-inner video {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
 </style>
 </head>
 <body>
@@ -3641,6 +3675,8 @@ function isDirectVideoFile(url) {
 function playVideo(rawUrl, fallback) {
   const raw = (rawUrl || "").trim();
   if (!raw) { stopVideo(); return; }
+  // Tell the page to drop background animations so the video gets the GPU/CPU.
+  document.body.classList.add("video-playing");
   if (isDirectVideoFile(raw)) {
     // local file or CDN-hosted MP4 → use <video> element
     if (els.videoIframe) {
@@ -3698,7 +3734,12 @@ function stopVideo() {
     try { els.videoFile.pause(); } catch (_) {}
     els.videoFile.removeAttribute("src");
     try { els.videoFile.load(); } catch (_) {}
+    if (els._videoErrHandler) {
+      els.videoFile.removeEventListener("error", els._videoErrHandler);
+      els._videoErrHandler = null;
+    }
   }
+  document.body.classList.remove("video-playing");
 }
 // Pre-warm the browser cache for direct video files (local OR CDN) at page load
 // so they play instantly even on bad WiFi. The feature steps don't open until
