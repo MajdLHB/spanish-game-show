@@ -3688,9 +3688,9 @@ function ensureBufferedVideo(url) {
   if (!els.videoFrameInner) return null;
   v = document.createElement("video");
   v.src = url;
-  v.preload = "auto";        // download the whole file ASAP
-  v.playsInline = true;       // iOS: don't take over the screen
-  v.controls = true;          // operator can scrub / play if autoplay blocked
+  v.preload = "auto";          // browser downloads aggressively in the background
+  v.playsInline = true;        // iOS: don't take over the screen
+  v.controls = true;           // operator can scrub / play if autoplay blocked
   els.videoFrameInner.appendChild(v);
   VIDEO_BUFFERS.set(url, v);
   try { v.load(); } catch (_) {}
