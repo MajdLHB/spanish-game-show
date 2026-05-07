@@ -2917,11 +2917,14 @@ const WORDS = [
     direction: "horizontal",
     startRow: 3, startCol: 1,
     hint:    { kind: "emojis", value: ["🛒", "🥬", "💰"] },
-    // To switch from YouTube to a self-hosted MP4 (smoother on weak networks):
-    //   1. drop supermercado.mp4 in the repo root, commit & push to initial-build
-    //   2. replace the url below with:
-    //      "https://cdn.jsdelivr.net/gh/MajdLHB/spanish-game-show@initial-build/supermercado.mp4"
-    feature: { kind: "video", url: "https://www.youtube.com/embed/YiqBolcimm0" }
+    // Primary: self-hosted MP4 via jsDelivr CDN. Fallback (if CDN errors): the
+    // original YouTube embed — independent network path, so even if jsDelivr is
+    // blocked/down the segment still plays.
+    feature: {
+      kind: "video",
+      url:      "https://cdn.jsdelivr.net/gh/MajdLHB/spanish-game-show@initial-build/supermercado.mp4",
+      fallback: "https://www.youtube.com/embed/YiqBolcimm0"
+    }
   },
   {
     id: 2,
@@ -2929,10 +2932,14 @@ const WORDS = [
     direction: "horizontal",
     startRow: 7, startCol: 0,
     hint:    { kind: "emojis", value: ["💍", "💎", "⌚"] },
-    // Served via jsDelivr's global CDN (free, edge-cached) instead of GitHub Pages
-    // direct, so playback is smooth even on weak networks. The file lives in the
-    // repo at /joyeria.mp4 — jsDelivr just mirrors it from the initial-build branch.
-    feature: { kind: "video", url: "https://cdn.jsdelivr.net/gh/MajdLHB/spanish-game-show@initial-build/joyeria.mp4" }
+    // Primary: jsDelivr CDN. Fallback: the same MP4 served directly from the
+    // page origin (GitHub Pages) — no YouTube backup since the original was
+    // embedding-blocked. Both paths point at the same physical file.
+    feature: {
+      kind: "video",
+      url:      "https://cdn.jsdelivr.net/gh/MajdLHB/spanish-game-show@initial-build/joyeria.mp4",
+      fallback: "joyeria.mp4"
+    }
   },
   {
     id: 3,
@@ -3096,7 +3103,9 @@ function fillWord(idx) {
 const STEPS = [
   { kind: "preshow"     },
   { kind: "countdown"   },
-  { kind: "logo_splash", duration: 2500 },
+  // First logo reveal: wait for the operator to press Next before going into
+  // team intros (gives the host time to talk over the logo).
+  { kind: "logo_splash", manual: true },
   // team A: big-name reveal → name shrinks up + member 0 highlighted (waits for Next)
   { kind: "team_name",   team: "a" },
   { kind: "team_member", team: "a", idx: 0 },
@@ -3268,9 +3277,14 @@ function applyStep() {
     case "logo_splash":
       hideBoardChrome();
       els.introLogo.classList.add("active");
-      els.nextBtn.classList.add("hidden");
       sfx.fanfare();
-      state.pendingTimeout = setTimeout(advance, step.duration || 2500);
+      if (step.manual) {
+        // Operator-paced: stay on the logo until Next is pressed.
+        els.nextBtn.classList.remove("hidden");
+      } else {
+        els.nextBtn.classList.add("hidden");
+        state.pendingTimeout = setTimeout(advance, step.duration || 2500);
+      }
       break;
 
     case "team_name": {
@@ -3435,7 +3449,7 @@ function applyStep() {
       if (w.feature.kind === "video") {
         els.featureVideo.style.display = "flex";
         els.featureGuest.style.display = "none";
-        playVideo(w.feature.url);
+        playVideo(w.feature.url, w.feature.fallback);
       } else {
         els.featureVideo.style.display = "none";
         els.featureGuest.style.display = "flex";
@@ -3624,7 +3638,7 @@ function isDirectVideoFile(url) {
   // Anything else (YouTube/Vimeo/embed pages) plays via <iframe>.
   return !!url && /\.(mp4|webm|ogg|ogv|mov|m4v)(\?|#|$)/i.test(url);
 }
-function playVideo(rawUrl) {
+function playVideo(rawUrl, fallback) {
   const raw = (rawUrl || "").trim();
   if (!raw) { stopVideo(); return; }
   if (isDirectVideoFile(raw)) {
@@ -3635,6 +3649,22 @@ function playVideo(rawUrl) {
     }
     if (els.videoFile) {
       els.videoFile.classList.add("active");
+      // Failsafe: if this MP4 errors (CDN unreachable, blocked, file missing),
+      // hand off to the fallback URL once. The listener is one-shot to avoid
+      // ping-ponging if the fallback also fails.
+      if (els._videoErrHandler) {
+        els.videoFile.removeEventListener("error", els._videoErrHandler);
+        els._videoErrHandler = null;
+      }
+      if (fallback) {
+        const handler = () => {
+          els.videoFile.removeEventListener("error", handler);
+          els._videoErrHandler = null;
+          playVideo(fallback);
+        };
+        els._videoErrHandler = handler;
+        els.videoFile.addEventListener("error", handler);
+      }
       if (els.videoFile.getAttribute("src") !== raw) els.videoFile.src = raw;
       try { els.videoFile.currentTime = 0; } catch (_) {}
       const p = els.videoFile.play();
@@ -3649,6 +3679,10 @@ function playVideo(rawUrl) {
       els.videoFile.removeAttribute("src");
       try { els.videoFile.load(); } catch (_) {}
       els.videoFile.classList.remove("active");
+      if (els._videoErrHandler) {
+        els.videoFile.removeEventListener("error", els._videoErrHandler);
+        els._videoErrHandler = null;
+      }
     }
     if (els.videoIframe) {
       els.videoIframe.classList.add("active");
