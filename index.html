@@ -2443,9 +2443,75 @@ button, input { font-family: inherit; }
   transform: scale(1.08);
 }
 .sound-toggle .icon { font-size: 1.2rem; line-height: 1; }
+
+/* ============================================================
+   13. MOBILE — rotate-to-landscape gate
+   The show is built around a fixed 1920×1080 stage (16:9). On phones in
+   portrait it would scale to a thin sliver, so we hide the stage and show
+   a rotate prompt instead. Landscape phones/tablets use the existing
+   non-uniform fill scaling and work as-is. Desktop is untouched.
+============================================================ */
+.rotate-prompt {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 99999;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(0, 229, 255, .15), transparent 55%),
+    radial-gradient(ellipse 80% 60% at 80% 100%, rgba(255, 61, 131, .15), transparent 55%),
+    linear-gradient(180deg, #02030a 0%, #04060f 50%, #02030a 100%);
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 24px;
+  color: var(--text);
+  font-family: var(--display);
+}
+.rotate-prompt-icon {
+  font-size: 72px;
+  line-height: 1;
+  margin-bottom: 24px;
+  animation: rotate-hint 2.4s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+@keyframes rotate-hint {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-90deg); }
+}
+.rotate-prompt-title {
+  font-size: 28px; font-weight: 700; letter-spacing: .02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--cyan), var(--magenta));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.rotate-prompt-sub {
+  font-size: 16px; color: var(--text-soft);
+  max-width: 320px; line-height: 1.5;
+  font-family: var(--sans);
+}
+.rotate-prompt-show {
+  margin-top: 28px;
+  font-size: 12px; letter-spacing: .3em;
+  color: var(--text-mute);
+  font-family: var(--sans);
+}
+
+@media (orientation: portrait) and (max-width: 900px) {
+  .stage-wrap { display: none !important; }
+  .rotate-prompt { display: flex; }
+}
 </style>
 </head>
 <body>
+
+<!-- Mobile-portrait gate: shown only on small portrait viewports via media query.
+     On landscape mobile / tablet / desktop this is hidden and the stage renders normally. -->
+<div class="rotate-prompt" aria-hidden="true">
+  <div class="rotate-prompt-icon" aria-hidden="true">📱</div>
+  <div class="rotate-prompt-title">Gira tu teléfono</div>
+  <div class="rotate-prompt-sub">El show está diseñado para pantalla horizontal. Pon tu dispositivo en modo landscape para empezar.</div>
+  <div class="rotate-prompt-show">RINCONES&nbsp;&nbsp;DEL&nbsp;&nbsp;MUNDO</div>
+</div>
 
 <div class="stage-wrap">
   <div class="stage-fit" id="stage-fit">
@@ -2851,6 +2917,10 @@ const WORDS = [
     direction: "horizontal",
     startRow: 3, startCol: 1,
     hint:    { kind: "emojis", value: ["🛒", "🥬", "💰"] },
+    // To switch from YouTube to a self-hosted MP4 (smoother on weak networks):
+    //   1. drop supermercado.mp4 in the repo root, commit & push to initial-build
+    //   2. replace the url below with:
+    //      "https://cdn.jsdelivr.net/gh/MajdLHB/spanish-game-show@initial-build/supermercado.mp4"
     feature: { kind: "video", url: "https://www.youtube.com/embed/YiqBolcimm0" }
   },
   {
@@ -2859,7 +2929,10 @@ const WORDS = [
     direction: "horizontal",
     startRow: 7, startCol: 0,
     hint:    { kind: "emojis", value: ["💍", "💎", "⌚"] },
-    feature: { kind: "video", url: "joyeria.mp4" }
+    // Served via jsDelivr's global CDN (free, edge-cached) instead of GitHub Pages
+    // direct, so playback is smooth even on weak networks. The file lives in the
+    // repo at /joyeria.mp4 — jsDelivr just mirrors it from the initial-build branch.
+    feature: { kind: "video", url: "https://cdn.jsdelivr.net/gh/MajdLHB/spanish-game-show@initial-build/joyeria.mp4" }
   },
   {
     id: 3,
@@ -3546,15 +3619,16 @@ function toEmbedUrl(raw) {
   } catch (_) {}
   return url; // assume embed-friendly URL
 }
-function isLocalVideo(url) {
-  // Anything that isn't an http(s) URL is treated as a same-origin file path
-  return !!url && !/^https?:\/\//i.test(url);
+function isDirectVideoFile(url) {
+  // A direct video file (local path OR CDN-hosted MP4/WebM/etc.) plays via <video>.
+  // Anything else (YouTube/Vimeo/embed pages) plays via <iframe>.
+  return !!url && /\.(mp4|webm|ogg|ogv|mov|m4v)(\?|#|$)/i.test(url);
 }
 function playVideo(rawUrl) {
   const raw = (rawUrl || "").trim();
   if (!raw) { stopVideo(); return; }
-  if (isLocalVideo(raw)) {
-    // local file → use <video> element
+  if (isDirectVideoFile(raw)) {
+    // local file or CDN-hosted MP4 → use <video> element
     if (els.videoIframe) {
       els.videoIframe.classList.remove("active");
       if (els.videoIframe.src) els.videoIframe.src = "";
@@ -3592,14 +3666,15 @@ function stopVideo() {
     try { els.videoFile.load(); } catch (_) {}
   }
 }
-// Pre-warm the browser cache for local feature videos at page load so they
-// play instantly even on bad WiFi (the joyería step doesn't open until later
-// in the show, by which time the file is already cached).
-(function prewarmLocalVideos() {
+// Pre-warm the browser cache for direct video files (local OR CDN) at page load
+// so they play instantly even on bad WiFi. The feature steps don't open until
+// later in the show, by which time the file is already in the HTTP cache.
+// (YouTube/iframe embeds are skipped — the YT player handles its own buffering.)
+(function prewarmDirectVideos() {
   try {
     WORDS.forEach(w => {
-      if (w && w.feature && w.feature.kind === "video" && isLocalVideo(w.feature.url)) {
-        fetch(w.feature.url).catch(() => {});
+      if (w && w.feature && w.feature.kind === "video" && isDirectVideoFile(w.feature.url)) {
+        fetch(w.feature.url, { mode: "cors", credentials: "omit" }).catch(() => {});
       }
     });
   } catch (_) {}
