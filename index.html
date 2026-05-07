@@ -2799,9 +2799,12 @@ body.video-playing .fv-show-logo * {
 
         <!-- Iframe loads with autoplay as soon as the feature step opens -->
         <div class="video-frame" id="video-frame">
-          <div class="video-frame-inner">
+          <div class="video-frame-inner" id="video-frame-inner">
             <iframe id="video-iframe" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-            <video  id="video-file"  preload="auto" playsinline controls></video>
+            <!-- One dedicated <video preload="auto"> per direct-MP4 URL is injected
+                 here at page load (see preBufferDirectVideos). Each element
+                 starts downloading its file immediately so playback is instant
+                 when the show reaches that step. -->
           </div>
         </div>
       </div>
@@ -3211,8 +3214,8 @@ const els = {
   featureVideo:   document.getElementById("feature-video"),
   featureGuest:   document.getElementById("feature-guest"),
   videoFrame:     document.getElementById("video-frame"),
+  videoFrameInner:document.getElementById("video-frame-inner"),
   videoIframe:    document.getElementById("video-iframe"),
-  videoFile:      document.getElementById("video-file"),
   guestName:      document.getElementById("guest-name"),
   guestTitle:     document.getElementById("guest-title"),
   guestWord:      document.getElementById("guest-word"),
@@ -3672,54 +3675,87 @@ function isDirectVideoFile(url) {
   // Anything else (YouTube/Vimeo/embed pages) plays via <iframe>.
   return !!url && /\.(mp4|webm|ogg|ogv|mov|m4v)(\?|#|$)/i.test(url);
 }
+
+// One dedicated <video preload="auto"> per unique direct-MP4 URL. Created at
+// page load (see preBufferDirectVideos below), kept around for the lifetime
+// of the page so the file stays buffered and re-plays are instant.
+const VIDEO_BUFFERS = new Map();
+
+function ensureBufferedVideo(url) {
+  if (!url || !isDirectVideoFile(url)) return null;
+  let v = VIDEO_BUFFERS.get(url);
+  if (v) return v;
+  if (!els.videoFrameInner) return null;
+  v = document.createElement("video");
+  v.src = url;
+  v.preload = "auto";        // download the whole file ASAP
+  v.playsInline = true;       // iOS: don't take over the screen
+  v.controls = true;          // operator can scrub / play if autoplay blocked
+  els.videoFrameInner.appendChild(v);
+  VIDEO_BUFFERS.set(url, v);
+  try { v.load(); } catch (_) {}
+  return v;
+}
+
+function clearVideoErrHandler() {
+  if (els._videoErrHandler && els._videoErrTarget) {
+    els._videoErrTarget.removeEventListener("error", els._videoErrHandler);
+  }
+  els._videoErrHandler = null;
+  els._videoErrTarget = null;
+}
+
 function playVideo(rawUrl, fallback) {
   const raw = (rawUrl || "").trim();
   if (!raw) { stopVideo(); return; }
   // Tell the page to drop background animations so the video gets the GPU/CPU.
   document.body.classList.add("video-playing");
+  clearVideoErrHandler();
+
   if (isDirectVideoFile(raw)) {
-    // local file or CDN-hosted MP4 → use <video> element
+    // Hide the iframe (in case it was active before).
     if (els.videoIframe) {
       els.videoIframe.classList.remove("active");
       if (els.videoIframe.src) els.videoIframe.src = "";
     }
-    if (els.videoFile) {
-      els.videoFile.classList.add("active");
-      // Failsafe: if this MP4 errors (CDN unreachable, blocked, file missing),
-      // hand off to the fallback URL once. The listener is one-shot to avoid
-      // ping-ponging if the fallback also fails.
-      if (els._videoErrHandler) {
-        els.videoFile.removeEventListener("error", els._videoErrHandler);
+    // Pause every other buffered video so only one plays at a time.
+    VIDEO_BUFFERS.forEach((other) => {
+      if (other.src !== raw) {
+        try { other.pause(); } catch (_) {}
+        other.classList.remove("active");
+      }
+    });
+    // Activate the dedicated buffered <video> for this URL.
+    const v = ensureBufferedVideo(raw);
+    if (!v) return;
+    v.classList.add("active");
+
+    // Failsafe: if this MP4 errors (CDN unreachable, blocked, file missing),
+    // hand off to the fallback URL once. One-shot listener so we never
+    // ping-pong if the fallback also fails.
+    if (fallback) {
+      const handler = () => {
+        v.removeEventListener("error", handler);
         els._videoErrHandler = null;
-      }
-      if (fallback) {
-        const handler = () => {
-          els.videoFile.removeEventListener("error", handler);
-          els._videoErrHandler = null;
-          playVideo(fallback);
-        };
-        els._videoErrHandler = handler;
-        els.videoFile.addEventListener("error", handler);
-      }
-      if (els.videoFile.getAttribute("src") !== raw) els.videoFile.src = raw;
-      try { els.videoFile.currentTime = 0; } catch (_) {}
-      const p = els.videoFile.play();
-      if (p && p.catch) p.catch(() => {});
+        els._videoErrTarget = null;
+        playVideo(fallback);
+      };
+      els._videoErrHandler = handler;
+      els._videoErrTarget = v;
+      v.addEventListener("error", handler);
     }
+
+    try { v.currentTime = 0; } catch (_) {}
+    const p = v.play();
+    if (p && p.catch) p.catch(() => {});
   } else {
-    // remote URL → use YouTube/embed iframe
+    // Remote URL → use YouTube/embed iframe. Pause/hide all buffered videos.
     const url = toEmbedUrl(raw);
     if (!url) { stopVideo(); return; }
-    if (els.videoFile) {
-      try { els.videoFile.pause(); } catch (_) {}
-      els.videoFile.removeAttribute("src");
-      try { els.videoFile.load(); } catch (_) {}
-      els.videoFile.classList.remove("active");
-      if (els._videoErrHandler) {
-        els.videoFile.removeEventListener("error", els._videoErrHandler);
-        els._videoErrHandler = null;
-      }
-    }
+    VIDEO_BUFFERS.forEach((v) => {
+      try { v.pause(); } catch (_) {}
+      v.classList.remove("active");
+    });
     if (els.videoIframe) {
       els.videoIframe.classList.add("active");
       const sep = url.includes("?") ? "&" : "?";
@@ -3727,29 +3763,33 @@ function playVideo(rawUrl, fallback) {
     }
   }
 }
+
 function stopVideo() {
-  // setting src="" stops the audio/video immediately on every browser
+  // Setting iframe src="" stops the YT audio/video immediately on every browser.
   if (els.videoIframe && els.videoIframe.src) els.videoIframe.src = "";
-  if (els.videoFile) {
-    try { els.videoFile.pause(); } catch (_) {}
-    els.videoFile.removeAttribute("src");
-    try { els.videoFile.load(); } catch (_) {}
-    if (els._videoErrHandler) {
-      els.videoFile.removeEventListener("error", els._videoErrHandler);
-      els._videoErrHandler = null;
-    }
-  }
+  // Pause every buffered video but KEEP their src — so the buffer stays warm
+  // and the next .play() is instant. Don't call load() / removeAttribute("src");
+  // that would discard the buffer we worked to build.
+  VIDEO_BUFFERS.forEach((v) => {
+    try { v.pause(); } catch (_) {}
+    v.classList.remove("active");
+  });
+  clearVideoErrHandler();
   document.body.classList.remove("video-playing");
 }
-// Pre-warm the browser cache for direct video files (local OR CDN) at page load
-// so they play instantly even on bad WiFi. The feature steps don't open until
-// later in the show, by which time the file is already in the HTTP cache.
-// (YouTube/iframe embeds are skipped — the YT player handles its own buffering.)
-(function prewarmDirectVideos() {
+
+// Pre-buffer every direct video file in WORDS at page load. Each gets its own
+// dedicated <video preload="auto"> element which begins downloading the file
+// immediately into the browser's media buffer. By the time the show reaches a
+// feature step (minutes later), the file is fully buffered → playback is
+// instant and stutter-free even on weak networks. Fallback URLs aren't pre-
+// buffered: JOYERÍA's fallback is the same physical file from another origin
+// (would double the download), and SUPERMERCADO's fallback is a YouTube iframe.
+(function preBufferDirectVideos() {
   try {
     WORDS.forEach(w => {
-      if (w && w.feature && w.feature.kind === "video" && isDirectVideoFile(w.feature.url)) {
-        fetch(w.feature.url, { mode: "cors", credentials: "omit" }).catch(() => {});
+      if (w && w.feature && w.feature.kind === "video") {
+        ensureBufferedVideo(w.feature.url);
       }
     });
   } catch (_) {}
